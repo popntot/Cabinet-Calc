@@ -797,15 +797,15 @@
                 <h2 class="result-section-header">Assembly Notes</h2>
                 <p class="result-description">Step-by-step guidance for building and installing your drawers.</p>
 
-                <div class="assembly-step"><strong>1. Drawer Box Assembly:</strong> Cut all drawer components per the dimensions above. Assemble by joining front, back, and sides with dados or rabbet joints. Slide the bottom panel into grooves (typically 6-8mm / 0.25" from bottom edge). Ensure box is square before fasteners set.</div>
+                <div class="assembly-step"><strong>1. Cabinet Box Assembly:</strong> Cut side panels to full height. Install top/bottom panels between sides. Add nailer strips: top front/back, bottom back pieces (flush with back), and perpendicular pieces. Nailers create rabbet for back panel if used. Total finished box dimensions match specifications above.</div>
 
-                <div class="assembly-step"><strong>2. Undermount Slide Installation:</strong> Mount slide cabinet brackets to cabinet sides at the heights shown in the Position Heights table. Ensure slides are level and parallel. Attach drawer brackets to drawer box bottom, maintaining the specified front setback distance.</div>
+                <div class="assembly-step"><strong>2. Drawer Box Assembly - Groove Setup:</strong> Cut grooves in drawer front and sides 18-19mm from bottom edge. Groove depth should be half the wall thickness (e.g., 12mm wall = 6mm groove). Groove width matches bottom panel thickness. Back panel sits above groove.</div>
 
-                <div class="assembly-step"><strong>3. Side Clearances:</strong> Verify <span id="totalSideClearance">-</span> total clearance on each side of drawer box for slide operation. This is critical for smooth movement.</div>
+                <div class="assembly-step"><strong>3. Drawer Box Assembly - Construction:</strong> Join front, back, and sides with dados or rabbet joints. Slide bottom panel into grooves from back. Screw bottom panel into drawer back from underneath. Ensure box is square before fasteners set.</div>
 
-                <div class="assembly-step"><strong>4. Drawer Front Attachment:</strong> After testing drawer operation, attach overlay fronts using adjustable front mounting brackets. The overlay fronts should extend <span id="overlapAmount">-</span> beyond the opening on all sides.</div>
+                <div class="assembly-step"><strong>4. Undermount Slide Installation:</strong> If using toe kick, build separately (100mm tall) and install level first. Mount slide cabinet brackets to cabinet sides at heights shown in Position Heights table. Ensure slides are level and parallel. Attach drawer brackets to drawer box bottom.</div>
 
-                <div class="assembly-step"><strong>5. Final Adjustments:</strong> Most undermount slides offer adjustment in multiple directions. Fine-tune drawer alignment after installation.</div>
+                <div class="assembly-step"><strong>5. Drawer Front Attachment:</strong> After testing drawer operation, attach overlay fronts using adjustable mounting brackets. Overlay fronts extend <span id="overlapAmount">-</span> beyond opening on all sides. Fine-tune alignment using slide adjustments.</div>
             </div>
 
             <!-- Warnings -->
@@ -1212,7 +1212,8 @@
             const nw = parseFloat(inputs.nailerWidth.value);
 
             // Calculate internal dimensions
-            const internalWidth = cw - (2 * bt);
+            const bottomPanelWidth = cw - (2 * bt); // Bottom panel width (cabinet internal width)
+            const internalWidth = bottomPanelWidth;
             const internalHeight = ch - (2 * bt);
             const internalDepth = cd;
 
@@ -1221,10 +1222,31 @@
             const openingHeight = (internalHeight - tg - bg - totalSpacing) / nd;
             const openingWidth = internalWidth;
 
+            // REAL-WORLD CABINET FORMULAS
+            // Drawer width reduction accounts for slides + clearances (typically 38mm total)
+            const drawerWidthReduction = sw + (2 * sc); // Slide width + clearances on both sides
+
             // Calculate drawer box dimensions
-            const drawerBoxWidth = internalWidth - sw - (2 * sc);
-            const drawerBoxHeight = openingHeight - 2; // 2mm clearance
-            const drawerBoxDepth = sl - fs;
+            const drawerFrontBackWidth = bottomPanelWidth - drawerWidthReduction; // e.g., 732 - 38 = 694mm
+            const drawerBoxWidth = drawerFrontBackWidth;
+
+            // Drawer height with clearance
+            const drawerBoxHeight = openingHeight - 2; // 2mm vertical clearance
+
+            // Drawer depth = slide length (full depth, not reduced by setback for box itself)
+            const drawerSidesDepth = sl;
+            const drawerBoxDepth = drawerSidesDepth;
+
+            // Bottom panel groove settings
+            const groovePosition = 18; // mm from bottom (standard 18-19mm)
+            const grooveDepth = dt / 2; // Half of drawer wall thickness
+
+            // Drawer back height (reduced to sit above bottom panel groove)
+            const drawerBackHeight = drawerBoxHeight - groovePosition - 4; // 4mm adjustment for groove
+
+            // Bottom panel dimensions (fits in grooves)
+            const drawerBottomWidth = drawerFrontBackWidth - (2 * dt);
+            const drawerBottomDepth = drawerSidesDepth - dt;
 
             // Calculate overlay front dimensions
             const overlayWidth = openingWidth + (2 * fo);
@@ -1247,23 +1269,23 @@
             const cutlist = document.getElementById('cabinetCutlist');
             cutlist.innerHTML = '';
 
-            const topBottom = createDimensionItem(
-                'Top/Bottom Panels',
-                `${fmt(cw)} × ${fmt(cd)} ${unit}`,
-                '2×',
-                'Full width and depth of cabinet'
-            );
-            cutlist.appendChild(topBottom);
-            flashElement(topBottom);
-
             const sides = createDimensionItem(
                 'Side Panels',
-                `${fmt(ch - 2*bt)} × ${fmt(cd)} ${unit}`,
+                `${fmt(ch)} × ${fmt(cd)} ${unit}`,
                 '2×',
-                'Height minus top/bottom thickness'
+                'Full cabinet height × depth'
             );
             cutlist.appendChild(sides);
             flashElement(sides);
+
+            const topBottom = createDimensionItem(
+                'Top/Bottom Panels',
+                `${fmt(bottomPanelWidth)} × ${fmt(cd)} ${unit}`,
+                '2×',
+                `Width ${fmt(cw)} - 2×${fmt(bt)} thickness = ${fmt(bottomPanelWidth)}${unit}`
+            );
+            cutlist.appendChild(topBottom);
+            flashElement(topBottom);
 
             const back = createDimensionItem(
                 'Back Panel',
@@ -1277,9 +1299,9 @@
             if (ne) {
                 const nailers = createDimensionItem(
                     'Nailer Strips',
-                    `${fmt(cw - 2*bt)} × ${fmt(nw)} ${unit}`,
+                    `${fmt(bottomPanelWidth)} × ${fmt(nw)} ${unit}`,
                     '4×',
-                    'Mounting strips for slide installation'
+                    'Top front/back, bottom back, perpendicular to back - allows rabbet for back panel'
                 );
                 cutlist.appendChild(nailers);
                 flashElement(nailers);
@@ -1298,38 +1320,38 @@
             const components = document.getElementById('drawerComponents');
             components.innerHTML = '';
 
+            const drawerSides = createDimensionItem(
+                'Drawer Sides',
+                `${fmt(drawerSidesDepth)} × ${fmt(drawerBoxHeight)} ${unit}`,
+                '2×',
+                `Slide length (${fmt(sl)}${unit}) × drawer height with ${fmt(groovePosition)}${unit} groove from bottom`
+            );
+            components.appendChild(drawerSides);
+            flashElement(drawerSides);
+
             const drawerFront = createDimensionItem(
                 'Drawer Front',
-                `${fmt(drawerBoxWidth)} × ${fmt(drawerBoxHeight)} ${unit}`,
+                `${fmt(drawerFrontBackWidth)} × ${fmt(drawerBoxHeight)} ${unit}`,
                 '1×',
-                'Full height of drawer box'
+                `Bottom panel width (${fmt(bottomPanelWidth)}${unit}) - ${fmt(drawerWidthReduction)}${unit} slide clearance`
             );
             components.appendChild(drawerFront);
             flashElement(drawerFront);
 
             const drawerBack = createDimensionItem(
                 'Drawer Back',
-                `${fmt(drawerBoxWidth)} × ${fmt(drawerBoxHeight - dbt)} ${unit}`,
+                `${fmt(drawerFrontBackWidth)} × ${fmt(drawerBackHeight)} ${unit}`,
                 '1×',
-                'Reduced height for bottom panel groove'
+                `Same width as front, height reduced to ${fmt(groovePosition)}${unit} above groove for bottom panel`
             );
             components.appendChild(drawerBack);
             flashElement(drawerBack);
 
-            const drawerSides = createDimensionItem(
-                'Drawer Sides',
-                `${fmt(drawerBoxDepth)} × ${fmt(drawerBoxHeight)} ${unit}`,
-                '2×',
-                'Length equals drawer depth'
-            );
-            components.appendChild(drawerSides);
-            flashElement(drawerSides);
-
             const drawerBottom = createDimensionItem(
                 'Drawer Bottom',
-                `${fmt(drawerBoxWidth - 2*dt)} × ${fmt(drawerBoxDepth - dt)} ${unit}`,
+                `${fmt(drawerBottomWidth)} × ${fmt(drawerBottomDepth)} ${unit}`,
                 '1×',
-                'Fits in grooves, accounts for material thickness'
+                `Fits in ${fmt(grooveDepth)}${unit} deep grooves, screws into back from bottom`
             );
             components.appendChild(drawerBottom);
             flashElement(drawerBottom);
@@ -1347,12 +1369,19 @@
             const formulas = document.getElementById('drawerFormulas');
             const clearanceVal = currentUnit === 'metric' ? '2mm' : '0.079in';
             formulas.innerHTML = `
-Drawer Box Width = Internal Width - Slide Width - (2 × Side Clearance)<br>
-                 = ${fmt(internalWidth)} - ${fmt(sw)} - (2 × ${fmt(sc)}) = ${fmt(drawerBoxWidth)} ${unit}<br><br>
-Drawer Box Height = Opening Height - ${clearanceVal} clearance<br>
-                  = ${fmt(openingHeight)} - ${clearanceVal} = ${fmt(drawerBoxHeight)} ${unit}<br><br>
-Drawer Box Depth = Slide Length - Front Setback<br>
-                 = ${fmt(sl)} - ${fmt(fs)} = ${fmt(drawerBoxDepth)} ${unit}
+<strong>REAL-WORLD CABINET FORMULAS:</strong><br><br>
+<strong>Bottom Panel Width</strong> = Cabinet Width - (2 × Material Thickness)<br>
+                     = ${fmt(cw)} - (2 × ${fmt(bt)}) = ${fmt(bottomPanelWidth)} ${unit}<br><br>
+<strong>Drawer Front/Back Width</strong> = Bottom Panel Width - Slide Clearance<br>
+                         = ${fmt(bottomPanelWidth)} - ${fmt(drawerWidthReduction)} = ${fmt(drawerFrontBackWidth)} ${unit}<br>
+                         <em>(Slide clearance = ${fmt(sw)} slide width + 2 × ${fmt(sc)} clearance = ${fmt(drawerWidthReduction)}${unit})</em><br><br>
+<strong>Drawer Sides Depth</strong> = Slide Length<br>
+                    = ${fmt(sl)} ${unit}<br><br>
+<strong>Drawer Front Height</strong> = Opening Height - ${clearanceVal} vertical clearance<br>
+                     = ${fmt(openingHeight)} - ${clearanceVal} = ${fmt(drawerBoxHeight)} ${unit}<br><br>
+<strong>Drawer Back Height</strong> = Front Height - ${fmt(groovePosition)}${unit} groove position - 4${unit} adjustment<br>
+                    = ${fmt(drawerBoxHeight)} - ${fmt(groovePosition)} - 4 = ${fmt(drawerBackHeight)} ${unit}<br><br>
+<strong>Bottom Panel Groove</strong>: ${fmt(groovePosition)}${unit} from bottom, ${fmt(grooveDepth)}${unit} deep (half of ${fmt(dt)}${unit} wall thickness)
             `;
 
             const dimensions = document.getElementById('drawerDimensions');
