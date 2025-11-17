@@ -1,0 +1,1213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Professional cabinet and drawer dimension calculator for custom cabinetry with undermount drawer slides. Calculate precise measurements in real-time.">
+    <meta name="keywords" content="cabinet calculator, drawer calculator, undermount slides, cabinet dimensions, woodworking calculator">
+    <title>Cabinet & Drawer Calculator - Precision Measurements for Undermount Slides</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #fafafa;
+            --bg-card: #ffffff;
+            --text-primary: #1a1a1a;
+            --text-secondary: #525252;
+            --text-tertiary: #737373;
+            --border-light: #e5e5e5;
+            --border-medium: #d4d4d4;
+            --border-hover: #a3a3a3;
+            --accent: #1a1a1a;
+            --success: #22c55e;
+            --warning-bg: #fef3c7;
+            --warning-border: #fcd34d;
+            --warning-text: #92400e;
+            --info-bg: #f5f5f5;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.5;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-primary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-medium);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--border-hover);
+        }
+
+        /* Header */
+        header {
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border-light);
+            padding: 32px 40px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        h1 {
+            font-size: 24px;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            margin-bottom: 4px;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        /* Main Layout */
+        .container {
+            display: grid;
+            grid-template-columns: 420px 1fr;
+            min-height: calc(100vh - 120px);
+        }
+
+        /* Input Sidebar */
+        .sidebar {
+            background: var(--bg-primary);
+            border-right: 1px solid var(--border-light);
+            padding: 32px 24px;
+            overflow-y: auto;
+            max-height: calc(100vh - 120px);
+            position: sticky;
+            top: 120px;
+        }
+
+        /* Results Area */
+        .results {
+            background: var(--bg-card);
+            padding: 40px;
+            overflow-y: auto;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .info-card {
+            background: var(--info-bg);
+            border: 1px solid var(--border-light);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .quick-ref-card {
+            border: 2px solid var(--text-primary);
+            background: var(--bg-card);
+            margin-bottom: 32px;
+        }
+
+        /* Section Headers */
+        .section-header {
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+            display: block;
+        }
+
+        .result-section-header {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            margin-top: 32px;
+        }
+
+        .result-section-header:first-child {
+            margin-top: 0;
+        }
+
+        .result-description {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+        }
+
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+
+        input[type="number"],
+        input[type="text"],
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-medium);
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+            background: var(--bg-card);
+            transition: all 0.2s ease;
+        }
+
+        input[type="number"]:hover,
+        input[type="text"]:hover,
+        select:hover {
+            border-color: var(--border-hover);
+        }
+
+        input[type="number"]:focus,
+        input[type="text"]:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(26, 26, 26, 0.1);
+        }
+
+        .helper-text {
+            font-size: 12px;
+            color: var(--text-tertiary);
+            font-style: italic;
+            margin-top: 4px;
+        }
+
+        /* Live Indicator */
+        .live-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+        }
+
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--success);
+            border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.5;
+                transform: scale(1.1);
+            }
+        }
+
+        /* Dimension Items */
+        .dimension-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .dimension-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 12px;
+            background: var(--info-bg);
+            border-radius: 6px;
+            transition: background 0.3s ease;
+        }
+
+        .dimension-item.flash {
+            animation: flashGreen 0.5s ease;
+        }
+
+        @keyframes flashGreen {
+            0%, 100% {
+                background: var(--info-bg);
+            }
+            50% {
+                background: rgba(34, 197, 94, 0.1);
+            }
+        }
+
+        .dimension-label {
+            font-size: 13px;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .qty-badge {
+            background: var(--border-medium);
+            color: var(--text-primary);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .dimension-value {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .dimension-context {
+            font-size: 12px;
+            color: var(--text-tertiary);
+            margin-left: 32px;
+            margin-top: 4px;
+        }
+
+        /* Formula Box */
+        .formula-box {
+            background: var(--info-bg);
+            border: 1px solid var(--border-light);
+            border-radius: 6px;
+            padding: 12px;
+            margin: 16px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        /* Quick Reference Grid */
+        .quick-ref-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .quick-ref-item {
+            text-align: center;
+        }
+
+        .quick-ref-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            margin-bottom: 8px;
+        }
+
+        .quick-ref-value {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-primary);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .quick-ref-unit {
+            font-size: 14px;
+            color: var(--text-tertiary);
+        }
+
+        /* Warnings */
+        .warnings {
+            background: var(--warning-bg);
+            border: 1px solid var(--warning-border);
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 24px;
+        }
+
+        .warning-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--warning-text);
+            margin-bottom: 12px;
+        }
+
+        .warning-item {
+            font-size: 13px;
+            color: var(--warning-text);
+            margin-bottom: 8px;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .warning-item:before {
+            content: "⚠";
+            position: absolute;
+            left: 0;
+        }
+
+        .warning-item:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Assembly Notes */
+        .assembly-notes {
+            margin-top: 32px;
+        }
+
+        .assembly-step {
+            padding: 12px;
+            background: var(--info-bg);
+            border-radius: 6px;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+
+        .assembly-step strong {
+            color: var(--text-primary);
+        }
+
+        /* Footer */
+        footer {
+            background: var(--bg-card);
+            border-top: 1px solid var(--border-light);
+            padding: 40px;
+            text-align: center;
+        }
+
+        .donation-section {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .donation-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--text-primary);
+            color: var(--bg-card);
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            margin-bottom: 16px;
+        }
+
+        .donation-btn:hover {
+            background: var(--bg-card);
+            color: var(--text-primary);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .donation-btn svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .footer-text {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .credit {
+            font-size: 12px;
+            color: var(--text-tertiary);
+        }
+
+        .credit a {
+            color: var(--text-primary);
+            text-decoration: none;
+        }
+
+        .credit a:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                position: static;
+                max-height: none;
+                border-right: none;
+                border-bottom: 1px solid var(--border-light);
+            }
+
+            .quick-ref-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+        }
+
+        /* Drawer Position Table */
+        .position-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 16px;
+        }
+
+        .position-table th,
+        .position-table td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-light);
+            font-size: 13px;
+        }
+
+        .position-table th {
+            background: var(--info-bg);
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 0.03em;
+        }
+
+        .position-table td {
+            font-variant-numeric: tabular-nums;
+        }
+
+        .position-table tr:last-child td {
+            border-bottom: none;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Cabinet & Drawer Calculator</h1>
+        <p class="subtitle">Precision measurements for undermount slide installation</p>
+    </header>
+
+    <div class="container">
+        <!-- Input Sidebar -->
+        <aside class="sidebar">
+            <div class="info-card">
+                ✨ All calculations update live as you type. Enter your dimensions to see real-time results.
+            </div>
+
+            <!-- Quick Presets -->
+            <div class="card">
+                <label for="preset" class="section-header">Quick Presets</label>
+                <select id="preset">
+                    <option value="custom">Custom (manual entry)</option>
+                    <option value="wills640">Will's 640mm Build</option>
+                    <option value="standard600">Standard 600mm Cabinet</option>
+                </select>
+            </div>
+
+            <!-- Cabinet Box Dimensions -->
+            <div class="card">
+                <span class="section-header">Cabinet Box Dimensions</span>
+
+                <div class="form-group">
+                    <label for="cabinetWidth">Width (mm)</label>
+                    <input type="number" id="cabinetWidth" value="640" step="1" min="100">
+                    <div class="helper-text">External width of cabinet box</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="cabinetHeight">Height (mm)</label>
+                    <input type="number" id="cabinetHeight" value="900" step="1" min="100">
+                    <div class="helper-text">External height of cabinet box</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="cabinetDepth">Depth (mm)</label>
+                    <input type="number" id="cabinetDepth" value="500" step="1" min="100">
+                    <div class="helper-text">External depth of cabinet box</div>
+                </div>
+            </div>
+
+            <!-- Material Thickness -->
+            <div class="card">
+                <span class="section-header">Material Thickness</span>
+
+                <div class="form-group">
+                    <label for="boxThickness">Cabinet Box Thickness (mm)</label>
+                    <input type="number" id="boxThickness" value="13" step="0.1" min="3">
+                    <div class="helper-text">Thickness of cabinet sides, top, bottom</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="drawerThickness">Drawer Side Thickness (mm)</label>
+                    <input type="number" id="drawerThickness" value="12" step="0.1" min="3">
+                    <div class="helper-text">Thickness of drawer front, back, sides</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="bottomThickness">Drawer Bottom Thickness (mm)</label>
+                    <input type="number" id="bottomThickness" value="6" step="0.1" min="3">
+                    <div class="helper-text">Thickness of drawer bottom panel</div>
+                </div>
+            </div>
+
+            <!-- Drawer Configuration -->
+            <div class="card">
+                <span class="section-header">Drawer Configuration</span>
+
+                <div class="form-group">
+                    <label for="numDrawers">Number of Drawers</label>
+                    <input type="number" id="numDrawers" value="3" step="1" min="1" max="10">
+                </div>
+
+                <div class="form-group">
+                    <label for="drawerSpacing">Spacing Between Drawers (mm)</label>
+                    <input type="number" id="drawerSpacing" value="2" step="0.1" min="0">
+                    <div class="helper-text">Vertical gap between each drawer</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="topGap">Top Gap (mm)</label>
+                    <input type="number" id="topGap" value="2" step="0.1" min="0">
+                    <div class="helper-text">Gap from cabinet top to first drawer</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="bottomGap">Bottom Gap (mm)</label>
+                    <input type="number" id="bottomGap" value="2" step="0.1" min="0">
+                    <div class="helper-text">Gap from last drawer to cabinet bottom</div>
+                </div>
+            </div>
+
+            <!-- Undermount Slide Specifications -->
+            <div class="card">
+                <span class="section-header">Undermount Slide Specifications</span>
+
+                <div class="form-group">
+                    <label for="slideLength">Slide Length (mm)</label>
+                    <select id="slideLength">
+                        <option value="250">250mm</option>
+                        <option value="300">300mm</option>
+                        <option value="350">350mm</option>
+                        <option value="400">400mm</option>
+                        <option value="450" selected>450mm</option>
+                        <option value="500">500mm</option>
+                        <option value="550">550mm</option>
+                        <option value="600">600mm</option>
+                    </select>
+                    <div class="helper-text">Length of undermount drawer slides</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="slideWidth">Slide Width - Total Both Sides (mm)</label>
+                    <input type="number" id="slideWidth" value="25" step="0.1" min="10">
+                    <div class="helper-text">Combined width of both slide mechanisms</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="frontSetback">Front Setback Distance (mm)</label>
+                    <input type="number" id="frontSetback" value="50" step="1" min="10">
+                    <div class="helper-text">Distance from drawer front to slide front</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="sideClr">Side Clearance Per Slide (mm)</label>
+                    <input type="number" id="sideClr" value="2" step="0.1" min="0">
+                    <div class="helper-text">Clearance per side for slide operation</div>
+                </div>
+            </div>
+
+            <!-- Drawer Front Options -->
+            <div class="card">
+                <span class="section-header">Drawer Front Options</span>
+
+                <div class="form-group">
+                    <label for="frontOverlap">Front Overlap Amount (mm)</label>
+                    <input type="number" id="frontOverlap" value="19" step="0.1" min="0">
+                    <div class="helper-text">How much overlay front extends beyond opening</div>
+                </div>
+            </div>
+
+            <!-- Nailer/Mounting Strips -->
+            <div class="card">
+                <span class="section-header">Nailer/Mounting Strips</span>
+
+                <div class="form-group">
+                    <label for="nailerEnabled">Include Nailers</label>
+                    <select id="nailerEnabled">
+                        <option value="yes">Yes</option>
+                        <option value="no">No</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="nailerWidth">Nailer Width (mm)</label>
+                    <input type="number" id="nailerWidth" value="100" step="1" min="10">
+                    <div class="helper-text">Width of nailer strips for mounting</div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Results Area -->
+        <main class="results">
+            <!-- Live Indicator -->
+            <div class="live-indicator">
+                <span class="pulse-dot"></span>
+                <span>Live calculations • Updates as you type</span>
+            </div>
+
+            <!-- Quick Reference -->
+            <div class="card quick-ref-card">
+                <span class="section-header">Quick Reference</span>
+                <div class="quick-ref-grid">
+                    <div class="quick-ref-item">
+                        <div class="quick-ref-label">Drawer Box Size</div>
+                        <div class="quick-ref-value">
+                            <span id="qrDrawerWidth">-</span> × <span id="qrDrawerHeight">-</span> × <span id="qrDrawerDepth">-</span>
+                            <span class="quick-ref-unit">mm</span>
+                        </div>
+                    </div>
+                    <div class="quick-ref-item">
+                        <div class="quick-ref-label">Number of Drawers</div>
+                        <div class="quick-ref-value">
+                            <span id="qrNumDrawers">-</span>
+                        </div>
+                    </div>
+                    <div class="quick-ref-item">
+                        <div class="quick-ref-label">Effective Extension</div>
+                        <div class="quick-ref-value">
+                            <span id="qrExtension">-</span>
+                            <span class="quick-ref-unit">mm</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cabinet Box Cutlist -->
+            <h2 class="result-section-header">Cabinet Box Cutlist</h2>
+            <p class="result-description">Dimensions for cutting cabinet box panels from your sheet material.</p>
+            <div class="dimension-list" id="cabinetCutlist"></div>
+
+            <!-- Drawer Components -->
+            <h2 class="result-section-header">Drawer Components (Per Drawer)</h2>
+            <p class="result-description">Cut these components for each drawer. Multiply quantities by number of drawers.</p>
+            <div class="dimension-list" id="drawerComponents"></div>
+
+            <!-- Drawer Dimensions Summary -->
+            <h2 class="result-section-header">Drawer Dimensions Summary</h2>
+            <p class="result-description">Key measurements showing the relationship between drawer box, opening, and overlay front.</p>
+            <div class="formula-box" id="drawerFormulas"></div>
+            <div class="dimension-list" id="drawerDimensions"></div>
+
+            <!-- Installation Specifications -->
+            <h2 class="result-section-header">Installation Specifications</h2>
+            <p class="result-description">Critical measurements for mounting undermount slides and ensuring proper operation.</p>
+            <div class="dimension-list" id="installationSpecs"></div>
+
+            <!-- Drawer Position Heights -->
+            <h2 class="result-section-header">Drawer Position Heights</h2>
+            <p class="result-description">Vertical positions for each drawer opening, measured from cabinet interior bottom. Use these heights when marking slide mounting positions.</p>
+            <table class="position-table" id="drawerPositions"></table>
+
+            <!-- Assembly Notes -->
+            <div class="assembly-notes">
+                <h2 class="result-section-header">Assembly Notes</h2>
+                <p class="result-description">Step-by-step guidance for building and installing your drawers.</p>
+
+                <div class="assembly-step"><strong>1. Drawer Box Assembly:</strong> Cut all drawer components per the dimensions above. Assemble by joining front, back, and sides with dados or rabbet joints. Slide the bottom panel into grooves (6-8mm from bottom edge). Ensure box is square before fasteners set.</div>
+
+                <div class="assembly-step"><strong>2. Undermount Slide Installation:</strong> Mount slide cabinet brackets to cabinet sides at the heights shown in the Position Heights table. Ensure slides are level and parallel. Attach drawer brackets to drawer box bottom, maintaining the specified front setback distance.</div>
+
+                <div class="assembly-step"><strong>3. Side Clearances:</strong> Verify <span id="totalSideClearance">-</span>mm total clearance on each side of drawer box for slide operation. This is critical for smooth movement.</div>
+
+                <div class="assembly-step"><strong>4. Drawer Front Attachment:</strong> After testing drawer operation, attach overlay fronts using adjustable front mounting brackets. The overlay fronts should extend <span id="overlapAmount">-</span>mm beyond the opening on all sides.</div>
+
+                <div class="assembly-step"><strong>5. Final Adjustments:</strong> Most undermount slides offer 2-3mm of adjustment in multiple directions. Fine-tune drawer alignment after installation.</div>
+            </div>
+
+            <!-- Warnings -->
+            <div id="warningsContainer"></div>
+        </main>
+    </div>
+
+    <footer>
+        <div class="donation-section">
+            <a href="https://buymeacoffee.com/YOUR_USERNAME" class="donation-btn" target="_blank" rel="noopener">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18 8h1a4 4 0 0 1 0 8h-1M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/>
+                    <line x1="6" y1="1" x2="6" y2="4"/>
+                    <line x1="10" y1="1" x2="10" y2="4"/>
+                    <line x1="14" y1="1" x2="14" y2="4"/>
+                </svg>
+                Buy Me a Coffee
+            </a>
+            <p class="footer-text">Find this tool helpful? Consider supporting its development.</p>
+            <p class="credit">Made with care by <a href="https://github.com/YOUR_GITHUB" target="_blank" rel="noopener">@your_name</a></p>
+        </div>
+    </footer>
+
+    <script>
+        // Get all input elements
+        const inputs = {
+            preset: document.getElementById('preset'),
+            cabinetWidth: document.getElementById('cabinetWidth'),
+            cabinetHeight: document.getElementById('cabinetHeight'),
+            cabinetDepth: document.getElementById('cabinetDepth'),
+            boxThickness: document.getElementById('boxThickness'),
+            drawerThickness: document.getElementById('drawerThickness'),
+            bottomThickness: document.getElementById('bottomThickness'),
+            numDrawers: document.getElementById('numDrawers'),
+            drawerSpacing: document.getElementById('drawerSpacing'),
+            topGap: document.getElementById('topGap'),
+            bottomGap: document.getElementById('bottomGap'),
+            slideLength: document.getElementById('slideLength'),
+            slideWidth: document.getElementById('slideWidth'),
+            frontSetback: document.getElementById('frontSetback'),
+            sideClr: document.getElementById('sideClr'),
+            frontOverlap: document.getElementById('frontOverlap'),
+            nailerEnabled: document.getElementById('nailerEnabled'),
+            nailerWidth: document.getElementById('nailerWidth')
+        };
+
+        // Preset configurations
+        const presets = {
+            wills640: {
+                cabinetWidth: 758,
+                cabinetHeight: 626,
+                cabinetDepth: 600,
+                boxThickness: 13,
+                drawerThickness: 12,
+                bottomThickness: 6,
+                numDrawers: 3,
+                drawerSpacing: 2,
+                topGap: 2,
+                bottomGap: 2,
+                slideLength: 450,
+                slideWidth: 25,
+                frontSetback: 50,
+                sideClr: 2,
+                frontOverlap: 19,
+                nailerEnabled: 'yes',
+                nailerWidth: 100
+            },
+            standard600: {
+                cabinetWidth: 600,
+                cabinetHeight: 800,
+                cabinetDepth: 500,
+                boxThickness: 18,
+                drawerThickness: 12,
+                bottomThickness: 6,
+                numDrawers: 4,
+                drawerSpacing: 2,
+                topGap: 2,
+                bottomGap: 2,
+                slideLength: 450,
+                slideWidth: 25,
+                frontSetback: 50,
+                sideClr: 2,
+                frontOverlap: 19,
+                nailerEnabled: 'yes',
+                nailerWidth: 100
+            }
+        };
+
+        // Apply preset
+        inputs.preset.addEventListener('change', function() {
+            const presetName = this.value;
+            if (presetName !== 'custom' && presets[presetName]) {
+                const preset = presets[presetName];
+                Object.keys(preset).forEach(key => {
+                    if (inputs[key]) {
+                        inputs[key].value = preset[key];
+                    }
+                });
+                calculate();
+            }
+        });
+
+        // Add event listeners to all inputs
+        Object.values(inputs).forEach(input => {
+            input.addEventListener('input', calculate);
+        });
+
+        // Utility function to format numbers
+        function fmt(num, decimals = 1) {
+            return Number(num).toFixed(decimals);
+        }
+
+        // Flash animation for changed values
+        function flashElement(element) {
+            element.classList.remove('flash');
+            void element.offsetWidth; // Trigger reflow
+            element.classList.add('flash');
+        }
+
+        // Create dimension item
+        function createDimensionItem(label, value, qty = null, context = null) {
+            const item = document.createElement('div');
+            item.className = 'dimension-item';
+
+            const labelDiv = document.createElement('div');
+            labelDiv.className = 'dimension-label';
+
+            if (qty) {
+                const badge = document.createElement('span');
+                badge.className = 'qty-badge';
+                badge.textContent = qty;
+                labelDiv.appendChild(badge);
+            }
+
+            const labelText = document.createElement('span');
+            labelText.textContent = label;
+            labelDiv.appendChild(labelText);
+
+            const valueDiv = document.createElement('div');
+            valueDiv.className = 'dimension-value';
+            valueDiv.textContent = value;
+
+            item.appendChild(labelDiv);
+            item.appendChild(valueDiv);
+
+            if (context) {
+                const contextDiv = document.createElement('div');
+                contextDiv.className = 'dimension-context';
+                contextDiv.textContent = context;
+                item.appendChild(contextDiv);
+            }
+
+            return item;
+        }
+
+        // Main calculation function
+        function calculate() {
+            // Parse all input values
+            const cw = parseFloat(inputs.cabinetWidth.value);
+            const ch = parseFloat(inputs.cabinetHeight.value);
+            const cd = parseFloat(inputs.cabinetDepth.value);
+            const bt = parseFloat(inputs.boxThickness.value);
+            const dt = parseFloat(inputs.drawerThickness.value);
+            const dbt = parseFloat(inputs.bottomThickness.value);
+            const nd = parseInt(inputs.numDrawers.value);
+            const ds = parseFloat(inputs.drawerSpacing.value);
+            const tg = parseFloat(inputs.topGap.value);
+            const bg = parseFloat(inputs.bottomGap.value);
+            const sl = parseFloat(inputs.slideLength.value);
+            const sw = parseFloat(inputs.slideWidth.value);
+            const fs = parseFloat(inputs.frontSetback.value);
+            const sc = parseFloat(inputs.sideClr.value);
+            const fo = parseFloat(inputs.frontOverlap.value);
+            const ne = inputs.nailerEnabled.value === 'yes';
+            const nw = parseFloat(inputs.nailerWidth.value);
+
+            // Calculate internal dimensions
+            const internalWidth = cw - (2 * bt);
+            const internalHeight = ch - (2 * bt);
+            const internalDepth = cd;
+
+            // Calculate drawer opening dimensions
+            const totalSpacing = (nd - 1) * ds;
+            const openingHeight = (internalHeight - tg - bg - totalSpacing) / nd;
+            const openingWidth = internalWidth;
+
+            // Calculate drawer box dimensions
+            const drawerBoxWidth = internalWidth - sw - (2 * sc);
+            const drawerBoxHeight = openingHeight - 2; // 2mm clearance
+            const drawerBoxDepth = sl - fs;
+
+            // Calculate overlay front dimensions
+            const overlayWidth = openingWidth + (2 * fo);
+            const overlayHeight = openingHeight + (2 * fo);
+
+            // Effective extension (how far drawer extends from cabinet)
+            const effectiveExtension = sl - fs;
+
+            // Update quick reference
+            document.getElementById('qrDrawerWidth').textContent = fmt(drawerBoxWidth);
+            document.getElementById('qrDrawerHeight').textContent = fmt(drawerBoxHeight);
+            document.getElementById('qrDrawerDepth').textContent = fmt(drawerBoxDepth);
+            document.getElementById('qrNumDrawers').textContent = nd;
+            document.getElementById('qrExtension').textContent = fmt(effectiveExtension);
+
+            // Cabinet Box Cutlist
+            const cutlist = document.getElementById('cabinetCutlist');
+            cutlist.innerHTML = '';
+
+            const topBottom = createDimensionItem(
+                'Top/Bottom Panels',
+                `${fmt(cw)} × ${fmt(cd)} mm`,
+                '2×',
+                'Full width and depth of cabinet'
+            );
+            cutlist.appendChild(topBottom);
+            flashElement(topBottom);
+
+            const sides = createDimensionItem(
+                'Side Panels',
+                `${fmt(ch - 2*bt)} × ${fmt(cd)} mm`,
+                '2×',
+                'Height minus top/bottom thickness'
+            );
+            cutlist.appendChild(sides);
+            flashElement(sides);
+
+            const back = createDimensionItem(
+                'Back Panel',
+                `${fmt(cw - 2*bt)} × ${fmt(ch - 2*bt)} mm`,
+                '1×',
+                'Fits between sides, top, and bottom'
+            );
+            cutlist.appendChild(back);
+            flashElement(back);
+
+            if (ne) {
+                const nailers = createDimensionItem(
+                    'Nailer Strips',
+                    `${fmt(cw - 2*bt)} × ${fmt(nw)} mm`,
+                    '4×',
+                    'Mounting strips for slide installation'
+                );
+                cutlist.appendChild(nailers);
+                flashElement(nailers);
+            }
+
+            const internal = createDimensionItem(
+                'Internal Opening',
+                `${fmt(internalWidth)} × ${fmt(internalHeight)} × ${fmt(internalDepth)} mm`,
+                null,
+                'Usable interior space'
+            );
+            cutlist.appendChild(internal);
+            flashElement(internal);
+
+            // Drawer Components
+            const components = document.getElementById('drawerComponents');
+            components.innerHTML = '';
+
+            const drawerFront = createDimensionItem(
+                'Drawer Front',
+                `${fmt(drawerBoxWidth)} × ${fmt(drawerBoxHeight)} mm`,
+                '1×',
+                'Full height of drawer box'
+            );
+            components.appendChild(drawerFront);
+            flashElement(drawerFront);
+
+            const drawerBack = createDimensionItem(
+                'Drawer Back',
+                `${fmt(drawerBoxWidth)} × ${fmt(drawerBoxHeight - dbt)} mm`,
+                '1×',
+                'Reduced height for bottom panel groove'
+            );
+            components.appendChild(drawerBack);
+            flashElement(drawerBack);
+
+            const drawerSides = createDimensionItem(
+                'Drawer Sides',
+                `${fmt(drawerBoxDepth)} × ${fmt(drawerBoxHeight)} mm`,
+                '2×',
+                'Length equals drawer depth'
+            );
+            components.appendChild(drawerSides);
+            flashElement(drawerSides);
+
+            const drawerBottom = createDimensionItem(
+                'Drawer Bottom',
+                `${fmt(drawerBoxWidth - 2*dt)} × ${fmt(drawerBoxDepth - dt)} mm`,
+                '1×',
+                'Fits in grooves, accounts for material thickness'
+            );
+            components.appendChild(drawerBottom);
+            flashElement(drawerBottom);
+
+            const overlayFront = createDimensionItem(
+                'Overlay Front',
+                `${fmt(overlayWidth)} × ${fmt(overlayHeight)} mm`,
+                '1×',
+                `Extends ${fmt(fo)}mm beyond opening on all sides`
+            );
+            components.appendChild(overlayFront);
+            flashElement(overlayFront);
+
+            // Drawer Dimensions Summary with Formulas
+            const formulas = document.getElementById('drawerFormulas');
+            formulas.innerHTML = `
+Drawer Box Width = Internal Width - Slide Width - (2 × Side Clearance)<br>
+                 = ${fmt(internalWidth)} - ${fmt(sw)} - (2 × ${fmt(sc)}) = ${fmt(drawerBoxWidth)} mm<br><br>
+Drawer Box Height = Opening Height - 2mm clearance<br>
+                  = ${fmt(openingHeight)} - 2 = ${fmt(drawerBoxHeight)} mm<br><br>
+Drawer Box Depth = Slide Length - Front Setback<br>
+                 = ${fmt(sl)} - ${fmt(fs)} = ${fmt(drawerBoxDepth)} mm
+            `;
+
+            const dimensions = document.getElementById('drawerDimensions');
+            dimensions.innerHTML = '';
+
+            const openingDim = createDimensionItem(
+                'Opening Size',
+                `${fmt(openingWidth)} × ${fmt(openingHeight)} mm`,
+                null,
+                'Space available for each drawer'
+            );
+            dimensions.appendChild(openingDim);
+            flashElement(openingDim);
+
+            const boxDim = createDimensionItem(
+                'Drawer Box Size',
+                `${fmt(drawerBoxWidth)} × ${fmt(drawerBoxHeight)} × ${fmt(drawerBoxDepth)} mm`,
+                null,
+                'Actual drawer box dimensions (W × H × D)'
+            );
+            dimensions.appendChild(boxDim);
+            flashElement(boxDim);
+
+            const overlayDim = createDimensionItem(
+                'Overlay Front Size',
+                `${fmt(overlayWidth)} × ${fmt(overlayHeight)} mm`,
+                null,
+                `Covers opening plus ${fmt(fo)}mm overlap per side`
+            );
+            dimensions.appendChild(overlayDim);
+            flashElement(overlayDim);
+
+            // Installation Specifications
+            const installSpecs = document.getElementById('installationSpecs');
+            installSpecs.innerHTML = '';
+
+            const slidePos = createDimensionItem(
+                'Slide Mounting Position',
+                'See Position Heights table below',
+                null,
+                'Vertical position for each drawer\'s slide brackets'
+            );
+            installSpecs.appendChild(slidePos);
+            flashElement(slidePos);
+
+            const extension = createDimensionItem(
+                'Effective Extension',
+                `${fmt(effectiveExtension)} mm`,
+                null,
+                'How far drawer extends from cabinet face'
+            );
+            installSpecs.appendChild(extension);
+            flashElement(extension);
+
+            const sideClearance = createDimensionItem(
+                'Total Side Clearance',
+                `${fmt(sc)} mm per side`,
+                null,
+                `${fmt(2*sc)} mm total clearance for slide operation`
+            );
+            installSpecs.appendChild(sideClearance);
+            flashElement(sideClearance);
+
+            const vertClearance = createDimensionItem(
+                'Vertical Clearance',
+                '2.0 mm',
+                null,
+                'Top and bottom clearance per drawer'
+            );
+            installSpecs.appendChild(vertClearance);
+            flashElement(vertClearance);
+
+            // Drawer Position Heights
+            const posTable = document.getElementById('drawerPositions');
+            posTable.innerHTML = `
+                <thead>
+                    <tr>
+                        <th>Drawer #</th>
+                        <th>Bottom Edge Height</th>
+                        <th>Top Edge Height</th>
+                        <th>Gap Above</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            `;
+
+            const tbody = posTable.querySelector('tbody');
+            let currentHeight = bg;
+
+            for (let i = 1; i <= nd; i++) {
+                const bottomHeight = currentHeight;
+                const topHeight = currentHeight + openingHeight;
+                const gap = i === 1 ? tg : ds;
+
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>Drawer ${i}</td>
+                    <td>${fmt(bottomHeight)} mm</td>
+                    <td>${fmt(topHeight)} mm</td>
+                    <td>${fmt(gap)} mm</td>
+                `;
+                tbody.appendChild(row);
+
+                currentHeight = topHeight + ds;
+            }
+
+            // Update assembly notes dynamic values
+            document.getElementById('totalSideClearance').textContent = fmt(sc);
+            document.getElementById('overlapAmount').textContent = fmt(fo);
+
+            // Warnings
+            const warnings = [];
+
+            if (drawerBoxDepth > sl) {
+                warnings.push('Drawer depth exceeds slide length. Reduce front setback or increase slide length.');
+            }
+
+            if (drawerBoxWidth < 200) {
+                warnings.push('Drawer width is less than 200mm. This may result in unstable drawer operation.');
+            }
+
+            if (openingHeight < 80) {
+                warnings.push('Opening height is less than 80mm. Drawers may be too shallow for practical use.');
+            }
+
+            if (sl > cd - 50) {
+                warnings.push('Slide length is very close to cabinet depth. Ensure adequate clearance for slide mounting.');
+            }
+
+            if (drawerBoxWidth < 100) {
+                warnings.push('Drawer width is critically narrow. Check your slide width and clearance settings.');
+            }
+
+            if (openingHeight < 60) {
+                warnings.push('Opening height is critically small. Consider reducing number of drawers or increasing cabinet height.');
+            }
+
+            // Display warnings
+            const warningsContainer = document.getElementById('warningsContainer');
+            if (warnings.length > 0) {
+                warningsContainer.innerHTML = `
+                    <div class="warnings">
+                        <div class="warning-title">⚠ Warnings</div>
+                        ${warnings.map(w => `<div class="warning-item">${w}</div>`).join('')}
+                    </div>
+                `;
+            } else {
+                warningsContainer.innerHTML = '';
+            }
+        }
+
+        // Initial calculation on page load
+        calculate();
+    </script>
+</body>
+</html>
