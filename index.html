@@ -497,6 +497,62 @@
         .position-table tr:last-child td {
             border-bottom: none;
         }
+
+        /* Unit Toggle */
+        .unit-toggle-card {
+            background: var(--text-primary);
+            color: var(--bg-card);
+            border: 2px solid var(--text-primary);
+        }
+
+        .unit-toggle-container {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .unit-btn {
+            flex: 1;
+            padding: 10px;
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: rgba(255, 255, 255, 0.6);
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+
+        .unit-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .unit-btn.active {
+            background: var(--bg-card);
+            color: var(--text-primary);
+            border-color: var(--bg-card);
+        }
+
+        .unit-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 8px;
+            text-align: center;
+            opacity: 0.9;
+        }
+
+        .smart-input-hint {
+            font-size: 11px;
+            color: var(--text-tertiary);
+            font-style: italic;
+            margin-top: 2px;
+            opacity: 0.8;
+        }
     </style>
 </head>
 <body>
@@ -509,7 +565,17 @@
         <!-- Input Sidebar -->
         <aside class="sidebar">
             <div class="info-card">
-                ✨ All calculations update live as you type. Enter your dimensions to see real-time results.
+                ✨ All calculations update live as you type. Enter your dimensions to see real-time results.<br>
+                <span class="smart-input-hint">💡 Tip: Enter values with units (e.g., "25mm", "1/4"", "3-1/2in") - they'll auto-convert!</span>
+            </div>
+
+            <!-- Unit Toggle -->
+            <div class="card unit-toggle-card">
+                <div class="unit-label">Measurement Units</div>
+                <div class="unit-toggle-container">
+                    <button class="unit-btn active" id="unitMetric" onclick="switchUnit('metric')">Metric (mm)</button>
+                    <button class="unit-btn" id="unitImperial" onclick="switchUnit('imperial')">Imperial (in)</button>
+                </div>
             </div>
 
             <!-- Quick Presets -->
@@ -681,7 +747,7 @@
                         <div class="quick-ref-label">Drawer Box Size</div>
                         <div class="quick-ref-value">
                             <span id="qrDrawerWidth">-</span> × <span id="qrDrawerHeight">-</span> × <span id="qrDrawerDepth">-</span>
-                            <span class="quick-ref-unit">mm</span>
+                            <span class="quick-ref-unit" id="qrUnitBox">mm</span>
                         </div>
                     </div>
                     <div class="quick-ref-item">
@@ -694,7 +760,7 @@
                         <div class="quick-ref-label">Effective Extension</div>
                         <div class="quick-ref-value">
                             <span id="qrExtension">-</span>
-                            <span class="quick-ref-unit">mm</span>
+                            <span class="quick-ref-unit" id="qrUnitExt">mm</span>
                         </div>
                     </div>
                 </div>
@@ -731,15 +797,15 @@
                 <h2 class="result-section-header">Assembly Notes</h2>
                 <p class="result-description">Step-by-step guidance for building and installing your drawers.</p>
 
-                <div class="assembly-step"><strong>1. Drawer Box Assembly:</strong> Cut all drawer components per the dimensions above. Assemble by joining front, back, and sides with dados or rabbet joints. Slide the bottom panel into grooves (6-8mm from bottom edge). Ensure box is square before fasteners set.</div>
+                <div class="assembly-step"><strong>1. Drawer Box Assembly:</strong> Cut all drawer components per the dimensions above. Assemble by joining front, back, and sides with dados or rabbet joints. Slide the bottom panel into grooves (typically 6-8mm / 0.25" from bottom edge). Ensure box is square before fasteners set.</div>
 
                 <div class="assembly-step"><strong>2. Undermount Slide Installation:</strong> Mount slide cabinet brackets to cabinet sides at the heights shown in the Position Heights table. Ensure slides are level and parallel. Attach drawer brackets to drawer box bottom, maintaining the specified front setback distance.</div>
 
-                <div class="assembly-step"><strong>3. Side Clearances:</strong> Verify <span id="totalSideClearance">-</span>mm total clearance on each side of drawer box for slide operation. This is critical for smooth movement.</div>
+                <div class="assembly-step"><strong>3. Side Clearances:</strong> Verify <span id="totalSideClearance">-</span> total clearance on each side of drawer box for slide operation. This is critical for smooth movement.</div>
 
-                <div class="assembly-step"><strong>4. Drawer Front Attachment:</strong> After testing drawer operation, attach overlay fronts using adjustable front mounting brackets. The overlay fronts should extend <span id="overlapAmount">-</span>mm beyond the opening on all sides.</div>
+                <div class="assembly-step"><strong>4. Drawer Front Attachment:</strong> After testing drawer operation, attach overlay fronts using adjustable front mounting brackets. The overlay fronts should extend <span id="overlapAmount">-</span> beyond the opening on all sides.</div>
 
-                <div class="assembly-step"><strong>5. Final Adjustments:</strong> Most undermount slides offer 2-3mm of adjustment in multiple directions. Fine-tune drawer alignment after installation.</div>
+                <div class="assembly-step"><strong>5. Final Adjustments:</strong> Most undermount slides offer adjustment in multiple directions. Fine-tune drawer alignment after installation.</div>
             </div>
 
             <!-- Warnings -->
@@ -764,6 +830,20 @@
     </footer>
 
     <script>
+        // Unit system tracking
+        let currentUnit = 'metric'; // 'metric' or 'imperial'
+        const MM_TO_INCH = 1 / 25.4;
+        const INCH_TO_MM = 25.4;
+
+        // Fields that should be converted (exclude count fields)
+        const convertibleFields = [
+            'cabinetWidth', 'cabinetHeight', 'cabinetDepth',
+            'boxThickness', 'drawerThickness', 'bottomThickness',
+            'drawerSpacing', 'topGap', 'bottomGap',
+            'slideWidth', 'frontSetback', 'sideClr',
+            'frontOverlap', 'nailerWidth'
+        ];
+
         // Get all input elements
         const inputs = {
             preset: document.getElementById('preset'),
@@ -847,9 +927,17 @@
             input.addEventListener('input', calculate);
         });
 
-        // Utility function to format numbers
-        function fmt(num, decimals = 1) {
+        // Utility function to format numbers based on current unit
+        function fmt(num, decimals = null) {
+            if (decimals === null) {
+                decimals = currentUnit === 'metric' ? 1 : 3;
+            }
             return Number(num).toFixed(decimals);
+        }
+
+        // Get unit suffix for display
+        function getUnitSuffix() {
+            return currentUnit === 'metric' ? 'mm' : 'in';
         }
 
         // Flash animation for changed values
@@ -857,6 +945,213 @@
             element.classList.remove('flash');
             void element.offsetWidth; // Trigger reflow
             element.classList.add('flash');
+        }
+
+        // Parse fractional input (e.g., "1/4", "3-1/2", "3 1/4", "1.25")
+        function parseFraction(str) {
+            str = str.trim();
+
+            // Handle simple decimal
+            if (!str.includes('/') && !str.includes('-') && !str.includes(' ')) {
+                const num = parseFloat(str);
+                return isNaN(num) ? null : num;
+            }
+
+            // Handle formats: "3-1/2", "3 1/4", "3 1 / 4"
+            const dashMatch = str.match(/^(\d+)\s*[-\s]\s*(\d+)\s*\/\s*(\d+)$/);
+            const spaceMatch = str.match(/^(\d+)\s+(\d+)\s*\/\s*(\d+)$/);
+
+            if (dashMatch) {
+                const whole = parseInt(dashMatch[1]);
+                const numerator = parseInt(dashMatch[2]);
+                const denominator = parseInt(dashMatch[3]);
+                return whole + (numerator / denominator);
+            } else if (spaceMatch) {
+                const whole = parseInt(spaceMatch[1]);
+                const numerator = parseInt(spaceMatch[2]);
+                const denominator = parseInt(spaceMatch[3]);
+                return whole + (numerator / denominator);
+            }
+
+            // Handle simple fraction "1/4"
+            const simpleMatch = str.match(/^(\d+)\s*\/\s*(\d+)$/);
+            if (simpleMatch) {
+                const numerator = parseInt(simpleMatch[1]);
+                const denominator = parseInt(simpleMatch[2]);
+                return numerator / denominator;
+            }
+
+            return null;
+        }
+
+        // Parse input with unit detection and conversion
+        function parseInputValue(inputStr) {
+            if (!inputStr || typeof inputStr !== 'string') return null;
+
+            inputStr = inputStr.trim();
+
+            // Detect unit in input
+            let detectedUnit = null;
+            let valueStr = inputStr;
+
+            // Check for explicit units at the end
+            const mmMatch = inputStr.match(/^(.+?)\s*mm$/i);
+            const cmMatch = inputStr.match(/^(.+?)\s*cm$/i);
+            const inchMatch = inputStr.match(/^(.+?)\s*(?:in|"|'')$/i);
+
+            if (mmMatch) {
+                detectedUnit = 'mm';
+                valueStr = mmMatch[1];
+            } else if (cmMatch) {
+                detectedUnit = 'cm';
+                valueStr = cmMatch[1];
+            } else if (inchMatch) {
+                detectedUnit = 'in';
+                valueStr = inchMatch[1];
+            } else if (inputStr.includes('/')) {
+                // Fractions without explicit unit are assumed to be inches
+                detectedUnit = 'in';
+                valueStr = inputStr;
+            }
+
+            // Parse the numeric value (handles fractions)
+            let numericValue = parseFraction(valueStr);
+            if (numericValue === null) {
+                numericValue = parseFloat(valueStr);
+            }
+            if (isNaN(numericValue)) return null;
+
+            // Convert to current unit if needed
+            if (detectedUnit) {
+                if (detectedUnit === 'mm' && currentUnit === 'imperial') {
+                    numericValue = numericValue * MM_TO_INCH;
+                } else if (detectedUnit === 'cm' && currentUnit === 'imperial') {
+                    numericValue = (numericValue * 10) * MM_TO_INCH;
+                } else if (detectedUnit === 'in' && currentUnit === 'metric') {
+                    numericValue = numericValue * INCH_TO_MM;
+                } else if (detectedUnit === 'cm' && currentUnit === 'metric') {
+                    numericValue = numericValue * 10;
+                }
+            }
+
+            return numericValue;
+        }
+
+        // Handle smart input parsing on blur
+        function handleSmartInput(event) {
+            const input = event.target;
+            const originalValue = input.value;
+
+            if (!originalValue) return;
+
+            const parsedValue = parseInputValue(originalValue);
+
+            if (parsedValue !== null) {
+                // Update input with parsed and converted value
+                input.value = currentUnit === 'metric' ? parsedValue.toFixed(1) : parsedValue.toFixed(3);
+                calculate();
+            }
+        }
+
+        // Switch between metric and imperial units
+        function switchUnit(newUnit) {
+            if (newUnit === currentUnit) return;
+
+            const conversionFactor = newUnit === 'imperial' ? MM_TO_INCH : INCH_TO_MM;
+            currentUnit = newUnit;
+
+            // Update button states
+            document.getElementById('unitMetric').classList.toggle('active', newUnit === 'metric');
+            document.getElementById('unitImperial').classList.toggle('active', newUnit === 'imperial');
+
+            // Convert all input values
+            convertibleFields.forEach(fieldName => {
+                const input = inputs[fieldName];
+                if (input && input.value) {
+                    const oldValue = parseFloat(input.value);
+                    const newValue = oldValue * conversionFactor;
+                    input.value = newUnit === 'imperial' ? newValue.toFixed(3) : newValue.toFixed(1);
+                    input.step = newUnit === 'imperial' ? '0.0625' : (fieldName.includes('Thickness') || fieldName.includes('Gap') || fieldName.includes('Spacing') || fieldName.includes('Clr') ? '0.1' : '1');
+                }
+            });
+
+            // Convert slide length dropdown
+            const slideSelect = inputs.slideLength;
+            if (slideSelect) {
+                const currentValue = parseFloat(slideSelect.value);
+                const newValue = currentValue * conversionFactor;
+
+                if (newUnit === 'imperial') {
+                    slideSelect.innerHTML = `
+                        <option value="9.84">10"</option>
+                        <option value="11.81">12"</option>
+                        <option value="13.78">14"</option>
+                        <option value="15.75">16"</option>
+                        <option value="17.72" ${Math.abs(newValue - 17.72) < 0.5 ? 'selected' : ''}>18"</option>
+                        <option value="19.69">20"</option>
+                        <option value="21.65">22"</option>
+                        <option value="23.62">24"</option>
+                    `;
+                } else {
+                    slideSelect.innerHTML = `
+                        <option value="250">250mm</option>
+                        <option value="300">300mm</option>
+                        <option value="350">350mm</option>
+                        <option value="400">400mm</option>
+                        <option value="450" ${Math.abs(newValue - 450) < 25 ? 'selected' : ''}>450mm</option>
+                        <option value="500">500mm</option>
+                        <option value="550">550mm</option>
+                        <option value="600">600mm</option>
+                    `;
+                }
+            }
+
+            updateLabels();
+            calculate();
+        }
+
+        // Update all labels to show current unit
+        function updateLabels() {
+            const unit = currentUnit === 'metric' ? 'mm' : 'in';
+            const labels = {
+                cabinetWidth: `Width (${unit})`,
+                cabinetHeight: `Height (${unit})`,
+                cabinetDepth: `Depth (${unit})`,
+                boxThickness: `Cabinet Box Thickness (${unit})`,
+                drawerThickness: `Drawer Side Thickness (${unit})`,
+                bottomThickness: `Drawer Bottom Thickness (${unit})`,
+                drawerSpacing: `Spacing Between Drawers (${unit})`,
+                topGap: `Top Gap (${unit})`,
+                bottomGap: `Bottom Gap (${unit})`,
+                slideWidth: `Slide Width - Total Both Sides (${unit})`,
+                frontSetback: `Front Setback Distance (${unit})`,
+                sideClr: `Side Clearance Per Slide (${unit})`,
+                frontOverlap: `Front Overlap Amount (${unit})`,
+                nailerWidth: `Nailer Width (${unit})`
+            };
+
+            Object.keys(labels).forEach(fieldName => {
+                const label = document.querySelector(`label[for="${fieldName}"]`);
+                if (label) {
+                    label.textContent = labels[fieldName];
+                }
+            });
+        }
+
+        // Add smart input handling to all convertible fields
+        function initializeSmartInputs() {
+            convertibleFields.forEach(fieldName => {
+                const input = inputs[fieldName];
+                if (input) {
+                    input.addEventListener('blur', handleSmartInput);
+                    input.addEventListener('keypress', function(e) {
+                        if (e.key === 'Enter') {
+                            e.preventDefault();
+                            input.blur();
+                        }
+                    });
+                }
+            });
         }
 
         // Create dimension item
@@ -939,11 +1234,14 @@
             const effectiveExtension = sl - fs;
 
             // Update quick reference
+            const unit = getUnitSuffix();
             document.getElementById('qrDrawerWidth').textContent = fmt(drawerBoxWidth);
             document.getElementById('qrDrawerHeight').textContent = fmt(drawerBoxHeight);
             document.getElementById('qrDrawerDepth').textContent = fmt(drawerBoxDepth);
             document.getElementById('qrNumDrawers').textContent = nd;
             document.getElementById('qrExtension').textContent = fmt(effectiveExtension);
+            document.getElementById('qrUnitBox').textContent = unit;
+            document.getElementById('qrUnitExt').textContent = unit;
 
             // Cabinet Box Cutlist
             const cutlist = document.getElementById('cabinetCutlist');
@@ -951,7 +1249,7 @@
 
             const topBottom = createDimensionItem(
                 'Top/Bottom Panels',
-                `${fmt(cw)} × ${fmt(cd)} mm`,
+                `${fmt(cw)} × ${fmt(cd)} ${unit}`,
                 '2×',
                 'Full width and depth of cabinet'
             );
@@ -960,7 +1258,7 @@
 
             const sides = createDimensionItem(
                 'Side Panels',
-                `${fmt(ch - 2*bt)} × ${fmt(cd)} mm`,
+                `${fmt(ch - 2*bt)} × ${fmt(cd)} ${unit}`,
                 '2×',
                 'Height minus top/bottom thickness'
             );
@@ -969,7 +1267,7 @@
 
             const back = createDimensionItem(
                 'Back Panel',
-                `${fmt(cw - 2*bt)} × ${fmt(ch - 2*bt)} mm`,
+                `${fmt(cw - 2*bt)} × ${fmt(ch - 2*bt)} ${unit}`,
                 '1×',
                 'Fits between sides, top, and bottom'
             );
@@ -979,7 +1277,7 @@
             if (ne) {
                 const nailers = createDimensionItem(
                     'Nailer Strips',
-                    `${fmt(cw - 2*bt)} × ${fmt(nw)} mm`,
+                    `${fmt(cw - 2*bt)} × ${fmt(nw)} ${unit}`,
                     '4×',
                     'Mounting strips for slide installation'
                 );
@@ -989,7 +1287,7 @@
 
             const internal = createDimensionItem(
                 'Internal Opening',
-                `${fmt(internalWidth)} × ${fmt(internalHeight)} × ${fmt(internalDepth)} mm`,
+                `${fmt(internalWidth)} × ${fmt(internalHeight)} × ${fmt(internalDepth)} ${unit}`,
                 null,
                 'Usable interior space'
             );
@@ -1002,7 +1300,7 @@
 
             const drawerFront = createDimensionItem(
                 'Drawer Front',
-                `${fmt(drawerBoxWidth)} × ${fmt(drawerBoxHeight)} mm`,
+                `${fmt(drawerBoxWidth)} × ${fmt(drawerBoxHeight)} ${unit}`,
                 '1×',
                 'Full height of drawer box'
             );
@@ -1011,7 +1309,7 @@
 
             const drawerBack = createDimensionItem(
                 'Drawer Back',
-                `${fmt(drawerBoxWidth)} × ${fmt(drawerBoxHeight - dbt)} mm`,
+                `${fmt(drawerBoxWidth)} × ${fmt(drawerBoxHeight - dbt)} ${unit}`,
                 '1×',
                 'Reduced height for bottom panel groove'
             );
@@ -1020,7 +1318,7 @@
 
             const drawerSides = createDimensionItem(
                 'Drawer Sides',
-                `${fmt(drawerBoxDepth)} × ${fmt(drawerBoxHeight)} mm`,
+                `${fmt(drawerBoxDepth)} × ${fmt(drawerBoxHeight)} ${unit}`,
                 '2×',
                 'Length equals drawer depth'
             );
@@ -1029,7 +1327,7 @@
 
             const drawerBottom = createDimensionItem(
                 'Drawer Bottom',
-                `${fmt(drawerBoxWidth - 2*dt)} × ${fmt(drawerBoxDepth - dt)} mm`,
+                `${fmt(drawerBoxWidth - 2*dt)} × ${fmt(drawerBoxDepth - dt)} ${unit}`,
                 '1×',
                 'Fits in grooves, accounts for material thickness'
             );
@@ -1038,22 +1336,23 @@
 
             const overlayFront = createDimensionItem(
                 'Overlay Front',
-                `${fmt(overlayWidth)} × ${fmt(overlayHeight)} mm`,
+                `${fmt(overlayWidth)} × ${fmt(overlayHeight)} ${unit}`,
                 '1×',
-                `Extends ${fmt(fo)}mm beyond opening on all sides`
+                `Extends ${fmt(fo)}${unit} beyond opening on all sides`
             );
             components.appendChild(overlayFront);
             flashElement(overlayFront);
 
             // Drawer Dimensions Summary with Formulas
             const formulas = document.getElementById('drawerFormulas');
+            const clearanceVal = currentUnit === 'metric' ? '2mm' : '0.079in';
             formulas.innerHTML = `
 Drawer Box Width = Internal Width - Slide Width - (2 × Side Clearance)<br>
-                 = ${fmt(internalWidth)} - ${fmt(sw)} - (2 × ${fmt(sc)}) = ${fmt(drawerBoxWidth)} mm<br><br>
-Drawer Box Height = Opening Height - 2mm clearance<br>
-                  = ${fmt(openingHeight)} - 2 = ${fmt(drawerBoxHeight)} mm<br><br>
+                 = ${fmt(internalWidth)} - ${fmt(sw)} - (2 × ${fmt(sc)}) = ${fmt(drawerBoxWidth)} ${unit}<br><br>
+Drawer Box Height = Opening Height - ${clearanceVal} clearance<br>
+                  = ${fmt(openingHeight)} - ${clearanceVal} = ${fmt(drawerBoxHeight)} ${unit}<br><br>
 Drawer Box Depth = Slide Length - Front Setback<br>
-                 = ${fmt(sl)} - ${fmt(fs)} = ${fmt(drawerBoxDepth)} mm
+                 = ${fmt(sl)} - ${fmt(fs)} = ${fmt(drawerBoxDepth)} ${unit}
             `;
 
             const dimensions = document.getElementById('drawerDimensions');
@@ -1061,7 +1360,7 @@ Drawer Box Depth = Slide Length - Front Setback<br>
 
             const openingDim = createDimensionItem(
                 'Opening Size',
-                `${fmt(openingWidth)} × ${fmt(openingHeight)} mm`,
+                `${fmt(openingWidth)} × ${fmt(openingHeight)} ${unit}`,
                 null,
                 'Space available for each drawer'
             );
@@ -1070,7 +1369,7 @@ Drawer Box Depth = Slide Length - Front Setback<br>
 
             const boxDim = createDimensionItem(
                 'Drawer Box Size',
-                `${fmt(drawerBoxWidth)} × ${fmt(drawerBoxHeight)} × ${fmt(drawerBoxDepth)} mm`,
+                `${fmt(drawerBoxWidth)} × ${fmt(drawerBoxHeight)} × ${fmt(drawerBoxDepth)} ${unit}`,
                 null,
                 'Actual drawer box dimensions (W × H × D)'
             );
@@ -1079,9 +1378,9 @@ Drawer Box Depth = Slide Length - Front Setback<br>
 
             const overlayDim = createDimensionItem(
                 'Overlay Front Size',
-                `${fmt(overlayWidth)} × ${fmt(overlayHeight)} mm`,
+                `${fmt(overlayWidth)} × ${fmt(overlayHeight)} ${unit}`,
                 null,
-                `Covers opening plus ${fmt(fo)}mm overlap per side`
+                `Covers opening plus ${fmt(fo)}${unit} overlap per side`
             );
             dimensions.appendChild(overlayDim);
             flashElement(overlayDim);
@@ -1101,7 +1400,7 @@ Drawer Box Depth = Slide Length - Front Setback<br>
 
             const extension = createDimensionItem(
                 'Effective Extension',
-                `${fmt(effectiveExtension)} mm`,
+                `${fmt(effectiveExtension)} ${unit}`,
                 null,
                 'How far drawer extends from cabinet face'
             );
@@ -1110,16 +1409,17 @@ Drawer Box Depth = Slide Length - Front Setback<br>
 
             const sideClearance = createDimensionItem(
                 'Total Side Clearance',
-                `${fmt(sc)} mm per side`,
+                `${fmt(sc)} ${unit} per side`,
                 null,
-                `${fmt(2*sc)} mm total clearance for slide operation`
+                `${fmt(2*sc)} ${unit} total clearance for slide operation`
             );
             installSpecs.appendChild(sideClearance);
             flashElement(sideClearance);
 
+            const vertClearanceValue = currentUnit === 'metric' ? '2.0' : '0.079';
             const vertClearance = createDimensionItem(
                 'Vertical Clearance',
-                '2.0 mm',
+                `${vertClearanceValue} ${unit}`,
                 null,
                 'Top and bottom clearance per drawer'
             );
@@ -1152,9 +1452,9 @@ Drawer Box Depth = Slide Length - Front Setback<br>
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td>Drawer ${i}</td>
-                    <td>${fmt(bottomHeight)} mm</td>
-                    <td>${fmt(topHeight)} mm</td>
-                    <td>${fmt(gap)} mm</td>
+                    <td>${fmt(bottomHeight)} ${unit}</td>
+                    <td>${fmt(topHeight)} ${unit}</td>
+                    <td>${fmt(gap)} ${unit}</td>
                 `;
                 tbody.appendChild(row);
 
@@ -1162,33 +1462,38 @@ Drawer Box Depth = Slide Length - Front Setback<br>
             }
 
             // Update assembly notes dynamic values
-            document.getElementById('totalSideClearance').textContent = fmt(sc);
-            document.getElementById('overlapAmount').textContent = fmt(fo);
+            document.getElementById('totalSideClearance').textContent = `${fmt(sc)}${unit}`;
+            document.getElementById('overlapAmount').textContent = `${fmt(fo)}${unit}`;
 
             // Warnings
             const warnings = [];
+            const minDrawerWidth = currentUnit === 'metric' ? 200 : 7.87;
+            const criticalDrawerWidth = currentUnit === 'metric' ? 100 : 3.94;
+            const minOpeningHeight = currentUnit === 'metric' ? 80 : 3.15;
+            const criticalOpeningHeight = currentUnit === 'metric' ? 60 : 2.36;
+            const depthClearance = currentUnit === 'metric' ? 50 : 1.97;
 
             if (drawerBoxDepth > sl) {
                 warnings.push('Drawer depth exceeds slide length. Reduce front setback or increase slide length.');
             }
 
-            if (drawerBoxWidth < 200) {
-                warnings.push('Drawer width is less than 200mm. This may result in unstable drawer operation.');
+            if (drawerBoxWidth < minDrawerWidth) {
+                warnings.push(`Drawer width is less than ${fmt(minDrawerWidth)}${unit}. This may result in unstable drawer operation.`);
             }
 
-            if (openingHeight < 80) {
-                warnings.push('Opening height is less than 80mm. Drawers may be too shallow for practical use.');
+            if (openingHeight < minOpeningHeight) {
+                warnings.push(`Opening height is less than ${fmt(minOpeningHeight)}${unit}. Drawers may be too shallow for practical use.`);
             }
 
-            if (sl > cd - 50) {
+            if (sl > cd - depthClearance) {
                 warnings.push('Slide length is very close to cabinet depth. Ensure adequate clearance for slide mounting.');
             }
 
-            if (drawerBoxWidth < 100) {
+            if (drawerBoxWidth < criticalDrawerWidth) {
                 warnings.push('Drawer width is critically narrow. Check your slide width and clearance settings.');
             }
 
-            if (openingHeight < 60) {
+            if (openingHeight < criticalOpeningHeight) {
                 warnings.push('Opening height is critically small. Consider reducing number of drawers or increasing cabinet height.');
             }
 
@@ -1205,6 +1510,9 @@ Drawer Box Depth = Slide Length - Front Setback<br>
                 warningsContainer.innerHTML = '';
             }
         }
+
+        // Initialize smart input handling
+        initializeSmartInputs();
 
         // Initial calculation on page load
         calculate();
