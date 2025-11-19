@@ -1,10 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Professional cabinet and drawer dimension calculator for custom cabinetry with undermount drawer slides. Calculate precise measurements in real-time.">
-    <meta name="keywords" content="cabinet calculator, drawer calculator, undermount slides, cabinet dimensions, woodworking calculator">
+    <meta name="description"
+        content="Professional cabinet and drawer dimension calculator for custom cabinetry with undermount drawer slides. Calculate precise measurements in real-time.">
+    <meta name="keywords"
+        content="cabinet calculator, drawer calculator, undermount slides, cabinet dimensions, woodworking calculator">
     <title>Cabinet & Drawer Calculator - Precision Measurements for Undermount Slides</title>
     <style>
         * {
@@ -222,10 +225,13 @@
         }
 
         @keyframes pulse {
-            0%, 100% {
+
+            0%,
+            100% {
                 opacity: 1;
                 transform: scale(1);
             }
+
             50% {
                 opacity: 0.5;
                 transform: scale(1.1);
@@ -254,9 +260,12 @@
         }
 
         @keyframes flashGreen {
-            0%, 100% {
+
+            0%,
+            100% {
                 background: var(--info-bg);
             }
+
             50% {
                 background: rgba(34, 197, 94, 0.1);
             }
@@ -555,6 +564,7 @@
         }
     </style>
 </head>
+
 <body>
     <header>
         <h1>Cabinet & Drawer Calculator</h1>
@@ -566,7 +576,8 @@
         <aside class="sidebar">
             <div class="info-card">
                 ✨ All calculations update live as you type. Enter your dimensions to see real-time results.<br>
-                <span class="smart-input-hint">💡 Tip: Enter values with units (e.g., "25mm", "1/4"", "3-1/2in") - they'll auto-convert!</span>
+                <span class="smart-input-hint">💡 Tip: Enter values with units (e.g., "25mm", "1/4"", "3-1/2in") -
+                    they'll auto-convert!</span>
             </div>
 
             <!-- Unit Toggle -->
@@ -639,94 +650,121 @@
                 <span class="section-header">Drawer Configuration</span>
 
                 <div class="form-group">
+                    <label for="drawerLayout">Drawer Layout</label>
+                    <select id="drawerLayout">
+                        <option value="equal">Equal Size (Standard)</option>
+                        <option value="top-small">Top Small, Rest Equal</option>
+                        <option value="2-small">2 Small, 1 Large</option>
+                        <option value="custom">Custom (Advanced)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
                     <label for="numDrawers">Number of Drawers</label>
                     <input type="number" id="numDrawers" value="3" step="1" min="1" max="10">
                 </div>
-
-                <div class="form-group">
-                    <label for="drawerSpacing">Spacing Between Drawers (mm)</label>
-                    <input type="number" id="drawerSpacing" value="2" step="0.1" min="0">
-                    <div class="helper-text">Vertical gap between each drawer</div>
-                </div>
-
-                <div class="form-group">
-                    <label for="topGap">Top Gap (mm)</label>
-                    <input type="number" id="topGap" value="2" step="0.1" min="0">
-                    <div class="helper-text">Gap from cabinet top to first drawer</div>
-                </div>
-
-                <div class="form-group">
-                    <label for="bottomGap">Bottom Gap (mm)</label>
-                    <input type="number" id="bottomGap" value="2" step="0.1" min="0">
-                    <div class="helper-text">Gap from last drawer to cabinet bottom</div>
-                </div>
             </div>
 
-            <!-- Undermount Slide Specifications -->
-            <div class="card">
-                <span class="section-header">Undermount Slide Specifications</span>
+            <!-- Advanced Settings Toggle -->
+            <button id="toggleAdvanced" class="donation-btn"
+                style="width: 100%; justify-content: center; margin-bottom: 20px; background: var(--bg-card); color: var(--text-primary); border: 1px solid var(--border-medium);">
+                <span>Show Advanced Settings</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    style="width: 16px; height: 16px;">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+            </button>
 
-                <div class="form-group">
-                    <label for="slideLength">Slide Length (mm)</label>
-                    <select id="slideLength">
-                        <option value="250">250mm</option>
-                        <option value="300">300mm</option>
-                        <option value="350">350mm</option>
-                        <option value="400">400mm</option>
-                        <option value="450" selected>450mm</option>
-                        <option value="500">500mm</option>
-                        <option value="550">550mm</option>
-                        <option value="600">600mm</option>
-                    </select>
-                    <div class="helper-text">Length of undermount drawer slides</div>
+            <!-- Advanced Settings Container -->
+            <div id="advancedSettings" style="display: none;">
+                <div class="card">
+                    <span class="section-header">Advanced Spacing</span>
+
+                    <div class="form-group">
+                        <label for="drawerSpacing">Spacing Between Drawers (mm)</label>
+                        <input type="number" id="drawerSpacing" value="2" step="0.1" min="0">
+                        <div class="helper-text">Vertical gap between each drawer</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="topGap">Top Gap (mm)</label>
+                        <input type="number" id="topGap" value="2" step="0.1" min="0">
+                        <div class="helper-text">Gap from cabinet top to first drawer</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="bottomGap">Bottom Gap (mm)</label>
+                        <input type="number" id="bottomGap" value="2" step="0.1" min="0">
+                        <div class="helper-text">Gap from last drawer to cabinet bottom</div>
+                    </div>
                 </div>
 
-                <div class="form-group">
-                    <label for="slideWidth">Slide Width - Total Both Sides (mm)</label>
-                    <input type="number" id="slideWidth" value="25" step="0.1" min="10">
-                    <div class="helper-text">Combined width of both slide mechanisms</div>
+                <!-- Undermount Slide Specifications -->
+                <div class="card">
+                    <span class="section-header">Undermount Slide Specifications</span>
+
+                    <div class="form-group">
+                        <label for="slideLength">Slide Length (mm)</label>
+                        <select id="slideLength">
+                            <option value="250">250mm</option>
+                            <option value="300">300mm</option>
+                            <option value="350">350mm</option>
+                            <option value="400">400mm</option>
+                            <option value="450" selected>450mm</option>
+                            <option value="500">500mm</option>
+                            <option value="550">550mm</option>
+                            <option value="600">600mm</option>
+                        </select>
+                        <div class="helper-text">Length of undermount drawer slides</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="slideWidth">Slide Width - Total Both Sides (mm)</label>
+                        <input type="number" id="slideWidth" value="25" step="0.1" min="10">
+                        <div class="helper-text">Combined width of both slide mechanisms</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="frontSetback">Front Setback Distance (mm)</label>
+                        <input type="number" id="frontSetback" value="50" step="1" min="10">
+                        <div class="helper-text">Distance from drawer front to slide front</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="sideClr">Side Clearance Per Slide (mm)</label>
+                        <input type="number" id="sideClr" value="2" step="0.1" min="0">
+                        <div class="helper-text">Clearance per side for slide operation</div>
+                    </div>
                 </div>
 
-                <div class="form-group">
-                    <label for="frontSetback">Front Setback Distance (mm)</label>
-                    <input type="number" id="frontSetback" value="50" step="1" min="10">
-                    <div class="helper-text">Distance from drawer front to slide front</div>
+                <!-- Drawer Front Options -->
+                <div class="card">
+                    <span class="section-header">Drawer Front Options</span>
+
+                    <div class="form-group">
+                        <label for="frontOverlap">Front Overlap Amount (mm)</label>
+                        <input type="number" id="frontOverlap" value="19" step="0.1" min="0">
+                        <div class="helper-text">How much overlay front extends beyond opening</div>
+                    </div>
                 </div>
 
-                <div class="form-group">
-                    <label for="sideClr">Side Clearance Per Slide (mm)</label>
-                    <input type="number" id="sideClr" value="2" step="0.1" min="0">
-                    <div class="helper-text">Clearance per side for slide operation</div>
-                </div>
-            </div>
+                <!-- Nailer/Mounting Strips -->
+                <div class="card">
+                    <span class="section-header">Nailer/Mounting Strips</span>
 
-            <!-- Drawer Front Options -->
-            <div class="card">
-                <span class="section-header">Drawer Front Options</span>
+                    <div class="form-group">
+                        <label for="nailerEnabled">Include Nailers</label>
+                        <select id="nailerEnabled">
+                            <option value="yes">Yes</option>
+                            <option value="no">No</option>
+                        </select>
+                    </div>
 
-                <div class="form-group">
-                    <label for="frontOverlap">Front Overlap Amount (mm)</label>
-                    <input type="number" id="frontOverlap" value="19" step="0.1" min="0">
-                    <div class="helper-text">How much overlay front extends beyond opening</div>
-                </div>
-            </div>
-
-            <!-- Nailer/Mounting Strips -->
-            <div class="card">
-                <span class="section-header">Nailer/Mounting Strips</span>
-
-                <div class="form-group">
-                    <label for="nailerEnabled">Include Nailers</label>
-                    <select id="nailerEnabled">
-                        <option value="yes">Yes</option>
-                        <option value="no">No</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="nailerWidth">Nailer Width (mm)</label>
-                    <input type="number" id="nailerWidth" value="100" step="1" min="10">
-                    <div class="helper-text">Width of nailer strips for mounting</div>
+                    <div class="form-group">
+                        <label for="nailerWidth">Nailer Width (mm)</label>
+                        <input type="number" id="nailerWidth" value="100" step="1" min="10">
+                        <div class="helper-text">Width of nailer strips for mounting</div>
+                    </div>
                 </div>
             </div>
         </aside>
@@ -746,7 +784,8 @@
                     <div class="quick-ref-item">
                         <div class="quick-ref-label">Drawer Box Size</div>
                         <div class="quick-ref-value">
-                            <span id="qrDrawerWidth">-</span> × <span id="qrDrawerHeight">-</span> × <span id="qrDrawerDepth">-</span>
+                            <span id="qrDrawerWidth">-</span> × <span id="qrDrawerHeight">-</span> × <span
+                                id="qrDrawerDepth">-</span>
                             <span class="quick-ref-unit" id="qrUnitBox">mm</span>
                         </div>
                     </div>
@@ -773,23 +812,27 @@
 
             <!-- Drawer Components -->
             <h2 class="result-section-header">Drawer Components (Per Drawer)</h2>
-            <p class="result-description">Cut these components for each drawer. Multiply quantities by number of drawers.</p>
+            <p class="result-description">Cut these components for each drawer. Multiply quantities by number of
+                drawers.</p>
             <div class="dimension-list" id="drawerComponents"></div>
 
             <!-- Drawer Dimensions Summary -->
             <h2 class="result-section-header">Drawer Dimensions Summary</h2>
-            <p class="result-description">Key measurements showing the relationship between drawer box, opening, and overlay front.</p>
+            <p class="result-description">Key measurements showing the relationship between drawer box, opening, and
+                overlay front.</p>
             <div class="formula-box" id="drawerFormulas"></div>
             <div class="dimension-list" id="drawerDimensions"></div>
 
             <!-- Installation Specifications -->
             <h2 class="result-section-header">Installation Specifications</h2>
-            <p class="result-description">Critical measurements for mounting undermount slides and ensuring proper operation.</p>
+            <p class="result-description">Critical measurements for mounting undermount slides and ensuring proper
+                operation.</p>
             <div class="dimension-list" id="installationSpecs"></div>
 
             <!-- Drawer Position Heights -->
             <h2 class="result-section-header">Drawer Position Heights</h2>
-            <p class="result-description">Vertical positions for each drawer opening, measured from cabinet interior bottom. Use these heights when marking slide mounting positions.</p>
+            <p class="result-description">Vertical positions for each drawer opening, measured from cabinet interior
+                bottom. Use these heights when marking slide mounting positions.</p>
             <table class="position-table" id="drawerPositions"></table>
 
             <!-- Assembly Notes -->
@@ -797,15 +840,28 @@
                 <h2 class="result-section-header">Assembly Notes</h2>
                 <p class="result-description">Step-by-step guidance for building and installing your drawers.</p>
 
-                <div class="assembly-step"><strong>1. Cabinet Box Assembly:</strong> Cut side panels to full height. Install top/bottom panels between sides. Add nailer strips: top front/back, bottom back pieces (flush with back), and perpendicular pieces. Nailers create rabbet for back panel if used. Total finished box dimensions match specifications above.</div>
+                <div class="assembly-step"><strong>1. Cabinet Box Assembly:</strong> Cut side panels to full height.
+                    Install top/bottom panels between sides. Add nailer strips: top front/back, bottom back pieces
+                    (flush with back), and perpendicular pieces. Nailers create rabbet for back panel if used. Total
+                    finished box dimensions match specifications above.</div>
 
-                <div class="assembly-step"><strong>2. Drawer Box Assembly - Groove Setup:</strong> Cut grooves in drawer front and sides 18-19mm from bottom edge. Groove depth should be half the wall thickness (e.g., 12mm wall = 6mm groove). Groove width matches bottom panel thickness. Back panel sits above groove.</div>
+                <div class="assembly-step"><strong>2. Drawer Box Assembly - Groove Setup:</strong> Cut grooves in drawer
+                    front and sides 18-19mm from bottom edge. Groove depth should be half the wall thickness (e.g., 12mm
+                    wall = 6mm groove). Groove width matches bottom panel thickness. Back panel sits above groove.</div>
 
-                <div class="assembly-step"><strong>3. Drawer Box Assembly - Construction:</strong> Join front, back, and sides with dados or rabbet joints. Slide bottom panel into grooves from back. Screw bottom panel into drawer back from underneath. Ensure box is square before fasteners set.</div>
+                <div class="assembly-step"><strong>3. Drawer Box Assembly - Construction:</strong> Join front, back, and
+                    sides with dados or rabbet joints. Slide bottom panel into grooves from back. Screw bottom panel
+                    into drawer back from underneath. Ensure box is square before fasteners set.</div>
 
-                <div class="assembly-step"><strong>4. Undermount Slide Installation:</strong> If using toe kick, build separately (100mm tall) and install level first. Mount slide cabinet brackets to cabinet sides at heights shown in Position Heights table. Ensure slides are level and parallel. Attach drawer brackets to drawer box bottom.</div>
+                <div class="assembly-step"><strong>4. Undermount Slide Installation:</strong> If using toe kick, build
+                    separately (100mm tall) and install level first. Mount slide cabinet brackets to cabinet sides at
+                    heights shown in Position Heights table. Ensure slides are level and parallel. Attach drawer
+                    brackets to drawer box bottom.</div>
 
-                <div class="assembly-step"><strong>5. Drawer Front Attachment:</strong> After testing drawer operation, attach overlay fronts using adjustable mounting brackets. Overlay fronts extend <span id="overlapAmount">-</span> beyond opening on all sides. Fine-tune alignment using slide adjustments.</div>
+                <div class="assembly-step"><strong>5. Drawer Front Attachment:</strong> After testing drawer operation,
+                    attach overlay fronts using adjustable mounting brackets. Overlay fronts extend <span
+                        id="overlapAmount">-</span> beyond opening on all sides. Fine-tune alignment using slide
+                    adjustments.</div>
             </div>
 
             <!-- Warnings -->
@@ -817,15 +873,16 @@
         <div class="donation-section">
             <a href="https://buymeacoffee.com/YOUR_USERNAME" class="donation-btn" target="_blank" rel="noopener">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M18 8h1a4 4 0 0 1 0 8h-1M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/>
-                    <line x1="6" y1="1" x2="6" y2="4"/>
-                    <line x1="10" y1="1" x2="10" y2="4"/>
-                    <line x1="14" y1="1" x2="14" y2="4"/>
+                    <path d="M18 8h1a4 4 0 0 1 0 8h-1M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z" />
+                    <line x1="6" y1="1" x2="6" y2="4" />
+                    <line x1="10" y1="1" x2="10" y2="4" />
+                    <line x1="14" y1="1" x2="14" y2="4" />
                 </svg>
                 Buy Me a Coffee
             </a>
             <p class="footer-text">Find this tool helpful? Consider supporting its development.</p>
-            <p class="credit">Made with care by <a href="https://github.com/YOUR_GITHUB" target="_blank" rel="noopener">@your_name</a></p>
+            <p class="credit">Made with care by <a href="https://github.com/YOUR_GITHUB" target="_blank"
+                    rel="noopener">@your_name</a></p>
         </div>
     </footer>
 
@@ -863,8 +920,30 @@
             sideClr: document.getElementById('sideClr'),
             frontOverlap: document.getElementById('frontOverlap'),
             nailerEnabled: document.getElementById('nailerEnabled'),
-            nailerWidth: document.getElementById('nailerWidth')
+            nailerWidth: document.getElementById('nailerWidth'),
+            drawerLayout: document.getElementById('drawerLayout')
         };
+
+        // Advanced Settings Toggle
+        const toggleBtn = document.getElementById('toggleAdvanced');
+        const advancedSettings = document.getElementById('advancedSettings');
+        let isAdvancedVisible = false;
+
+        if (toggleBtn && advancedSettings) {
+            toggleBtn.addEventListener('click', function () {
+                isAdvancedVisible = !isAdvancedVisible;
+                advancedSettings.style.display = isAdvancedVisible ? 'block' : 'none';
+                toggleBtn.querySelector('span').textContent = isAdvancedVisible ? 'Hide Advanced Settings' : 'Show Advanced Settings';
+                toggleBtn.querySelector('svg').style.transform = isAdvancedVisible ? 'rotate(180deg)' : 'rotate(0deg)';
+            });
+        }
+
+        // Track user modifications to avoid overwriting manual changes
+        const userModified = {
+            slideLength: false
+        };
+
+        inputs.slideLength.addEventListener('change', () => userModified.slideLength = true);
 
         // Preset configurations
         const presets = {
@@ -909,7 +988,7 @@
         };
 
         // Apply preset
-        inputs.preset.addEventListener('change', function() {
+        inputs.preset.addEventListener('change', function () {
             const presetName = this.value;
             if (presetName !== 'custom' && presets[presetName]) {
                 const preset = presets[presetName];
@@ -1144,7 +1223,7 @@
                 const input = inputs[fieldName];
                 if (input) {
                     input.addEventListener('blur', handleSmartInput);
-                    input.addEventListener('keypress', function(e) {
+                    input.addEventListener('keypress', function (e) {
                         if (e.key === 'Enter') {
                             e.preventDefault();
                             input.blur();
@@ -1152,46 +1231,69 @@
                     });
                 }
             });
-        }
+            // Update derived values based on smart defaults
+            function updateDerivedValues() {
+                // Only update if user hasn't manually modified the value
+                if (!userModified.slideLength) {
+                    const cabinetDepth = parseFloat(inputs.cabinetDepth.value);
+                    if (!isNaN(cabinetDepth)) {
+                        // Auto-calculate slide length: Depth - 50mm (or 2"), rounded down to nearest standard size
+                        // We'll use a simple heuristic: find the largest slide that fits with 50mm clearance
+                        const clearance = currentUnit === 'metric' ? 50 : 2;
+                        const maxSlideLen = cabinetDepth - clearance;
 
-        // Create dimension item
-        function createDimensionItem(label, value, qty = null, context = null) {
-            const item = document.createElement('div');
-            item.className = 'dimension-item';
+                        const options = Array.from(inputs.slideLength.options).map(opt => parseFloat(opt.value));
+                        // Sort descending to find largest that fits
+                        options.sort((a, b) => b - a);
 
-            const labelDiv = document.createElement('div');
-            labelDiv.className = 'dimension-label';
+                        const bestFit = options.find(len => len <= maxSlideLen);
 
-            if (qty) {
-                const badge = document.createElement('span');
-                badge.className = 'qty-badge';
-                badge.textContent = qty;
-                labelDiv.appendChild(badge);
+                        if (bestFit) {
+                            inputs.slideLength.value = bestFit;
+                        }
+                    }
+                }
             }
 
-            const labelText = document.createElement('span');
-            labelText.textContent = label;
-            labelDiv.appendChild(labelText);
+            // Create dimension item
+            function createDimensionItem(label, value, qty = null, context = null) {
+                const item = document.createElement('div');
+                item.className = 'dimension-item';
 
-            const valueDiv = document.createElement('div');
-            valueDiv.className = 'dimension-value';
-            valueDiv.textContent = value;
+                const labelDiv = document.createElement('div');
+                labelDiv.className = 'dimension-label';
 
-            item.appendChild(labelDiv);
-            item.appendChild(valueDiv);
+                if (qty) {
+                    const badge = document.createElement('span');
+                    badge.className = 'qty-badge';
+                    badge.textContent = qty;
+                    labelDiv.appendChild(badge);
+                }
 
-            if (context) {
-                const contextDiv = document.createElement('div');
-                contextDiv.className = 'dimension-context';
-                contextDiv.textContent = context;
-                item.appendChild(contextDiv);
+                const labelText = document.createElement('span');
+                labelText.textContent = label;
+                labelDiv.appendChild(labelText);
+
+                const valueDiv = document.createElement('div');
+                valueDiv.className = 'dimension-value';
+                valueDiv.textContent = value;
+
+                item.appendChild(labelDiv);
+                item.appendChild(valueDiv);
+
+                if (context) {
+                    const contextDiv = document.createElement('div');
+                    contextDiv.className = 'dimension-context';
+                    contextDiv.textContent = context;
+                    item.appendChild(contextDiv);
+                }
+
+                return item;
             }
 
-            return item;
-        }
+            // Update derived values first
+            updateDerivedValues();
 
-        // Main calculation function
-        function calculate() {
             // Parse all input values
             const cw = parseFloat(inputs.cabinetWidth.value);
             const ch = parseFloat(inputs.cabinetHeight.value);
@@ -1200,6 +1302,7 @@
             const dt = parseFloat(inputs.drawerThickness.value);
             const dbt = parseFloat(inputs.bottomThickness.value);
             const nd = parseInt(inputs.numDrawers.value);
+            const layout = inputs.drawerLayout.value;
             const ds = parseFloat(inputs.drawerSpacing.value);
             const tg = parseFloat(inputs.topGap.value);
             const bg = parseFloat(inputs.bottomGap.value);
@@ -1219,7 +1322,52 @@
 
             // Calculate drawer opening dimensions
             const totalSpacing = (nd - 1) * ds;
-            const openingHeight = (internalHeight - tg - bg - totalSpacing) / nd;
+            const totalAvailableHeight = internalHeight - tg - bg - totalSpacing;
+
+            // Calculate individual drawer heights based on layout
+            let drawerHeights = [];
+
+            if (layout === 'equal') {
+                const h = totalAvailableHeight / nd;
+                drawerHeights = Array(nd).fill(h);
+            } else if (layout === 'top-small') {
+                // Top drawer is small (e.g., 160mm or 15%), rest equal
+                // Heuristic: Small drawer is approx 160mm (metric) or 6.25" (imperial)
+                // But must not exceed available space
+                let smallH = currentUnit === 'metric' ? 160 : 6.25;
+                if (smallH > totalAvailableHeight * 0.4) {
+                    smallH = totalAvailableHeight * 0.25; // Fallback to 25% if space is tight
+                }
+
+                const remainingH = totalAvailableHeight - smallH;
+                const restCount = nd - 1;
+                const restH = remainingH / restCount;
+
+                drawerHeights = [smallH, ...Array(restCount).fill(restH)];
+            } else if (layout === '2-small') {
+                // Top 2 small, rest (1 or more) large
+                // If nd < 3, fallback to equal
+                if (nd < 3) {
+                    const h = totalAvailableHeight / nd;
+                    drawerHeights = Array(nd).fill(h);
+                } else {
+                    let smallH = currentUnit === 'metric' ? 160 : 6.25;
+                    if (smallH * 2 > totalAvailableHeight * 0.5) {
+                        smallH = totalAvailableHeight * 0.2; // Fallback
+                    }
+
+                    const remainingH = totalAvailableHeight - (smallH * 2);
+                    const restCount = nd - 2;
+                    const restH = remainingH / restCount;
+
+                    drawerHeights = [smallH, smallH, ...Array(restCount).fill(restH)];
+                }
+            } else {
+                // Custom/Fallback: Equal
+                const h = totalAvailableHeight / nd;
+                drawerHeights = Array(nd).fill(h);
+            }
+
             const openingWidth = internalWidth;
 
             // REAL-WORLD CABINET FORMULAS
@@ -1230,8 +1378,11 @@
             const drawerFrontBackWidth = bottomPanelWidth - drawerWidthReduction; // e.g., 732 - 38 = 694mm
             const drawerBoxWidth = drawerFrontBackWidth;
 
-            // Drawer height with clearance
-            const drawerBoxHeight = openingHeight - 2; // 2mm vertical clearance
+            // Drawer height with clearance (using first drawer as reference for general dims, but we'll list all in cutlist)
+            // Note: For the main summary, we'll show the "Common" or "Max" size, or a range if variable.
+            // Let's show the dimensions for the *largest* drawer in the summary to ensure it fits.
+            const maxOpeningHeight = Math.max(...drawerHeights);
+            const drawerBoxHeight = maxOpeningHeight - 2; // 2mm vertical clearance
 
             // Drawer depth = slide length (full depth, not reduced by setback for box itself)
             const drawerSidesDepth = sl;
@@ -1269,42 +1420,21 @@
             const cutlist = document.getElementById('cabinetCutlist');
             cutlist.innerHTML = '';
 
-            const sides = createDimensionItem(
-                'Side Panels',
-                `${fmt(ch)} × ${fmt(cd)} ${unit}`,
-                '2×',
-                'Full cabinet height × depth'
-            );
-            cutlist.appendChild(sides);
-            flashElement(sides);
+            // Helper to group identical items
+            function addCutlistItem(label, w, h, count, context) {
+                const dimStr = `${fmt(w)} × ${fmt(h)} ${unit}`;
+                const item = createDimensionItem(label, dimStr, `${count}×`, context);
+                cutlist.appendChild(item);
+                flashElement(item);
+            }
 
-            const topBottom = createDimensionItem(
-                'Top/Bottom Panels',
-                `${fmt(bottomPanelWidth)} × ${fmt(cd)} ${unit}`,
-                '2×',
-                `Width ${fmt(cw)} - 2×${fmt(bt)} thickness = ${fmt(bottomPanelWidth)}${unit}`
-            );
-            cutlist.appendChild(topBottom);
-            flashElement(topBottom);
-
-            const back = createDimensionItem(
-                'Back Panel',
-                `${fmt(cw - 2*bt)} × ${fmt(ch - 2*bt)} ${unit}`,
-                '1×',
-                'Fits between sides, top, and bottom'
-            );
-            cutlist.appendChild(back);
-            flashElement(back);
+            // Cabinet Box Parts
+            addCutlistItem('Side Panels', ch, cd, 2, 'Full cabinet height × depth');
+            addCutlistItem('Top/Bottom Panels', bottomPanelWidth, cd, 2, `Width ${fmt(cw)} - 2×${fmt(bt)} thickness`);
+            addCutlistItem('Back Panel', cw - 2 * bt, ch - 2 * bt, 1, 'Fits between sides, top, and bottom');
 
             if (ne) {
-                const nailers = createDimensionItem(
-                    'Nailer Strips',
-                    `${fmt(bottomPanelWidth)} × ${fmt(nw)} ${unit}`,
-                    '4×',
-                    'Top front/back, bottom back, perpendicular to back - allows rabbet for back panel'
-                );
-                cutlist.appendChild(nailers);
-                flashElement(nailers);
+                addCutlistItem('Nailer Strips', bottomPanelWidth, nw, 4, 'Top front/back, bottom back, perpendicular');
             }
 
             const internal = createDimensionItem(
@@ -1320,50 +1450,48 @@
             const components = document.getElementById('drawerComponents');
             components.innerHTML = '';
 
-            const drawerSides = createDimensionItem(
-                'Drawer Sides',
-                `${fmt(drawerSidesDepth)} × ${fmt(drawerBoxHeight)} ${unit}`,
-                '2×',
-                `Slide length (${fmt(sl)}${unit}) × drawer height with ${fmt(groovePosition)}${unit} groove from bottom`
-            );
-            components.appendChild(drawerSides);
-            flashElement(drawerSides);
+            // Group drawer parts by size
+            // We need to calculate parts for EACH drawer, then group them
+            const partsMap = new Map(); // key: "W x H", value: count
 
-            const drawerFront = createDimensionItem(
-                'Drawer Front',
-                `${fmt(drawerFrontBackWidth)} × ${fmt(drawerBoxHeight)} ${unit}`,
-                '1×',
-                `Bottom panel width (${fmt(bottomPanelWidth)}${unit}) - ${fmt(drawerWidthReduction)}${unit} slide clearance`
-            );
-            components.appendChild(drawerFront);
-            flashElement(drawerFront);
+            drawerHeights.forEach((h, idx) => {
+                const boxH = h - 2;
+                const backH = boxH - groovePosition - 4;
 
-            const drawerBack = createDimensionItem(
-                'Drawer Back',
-                `${fmt(drawerFrontBackWidth)} × ${fmt(drawerBackHeight)} ${unit}`,
-                '1×',
-                `Same width as front, height reduced to ${fmt(groovePosition)}${unit} above groove for bottom panel`
-            );
-            components.appendChild(drawerBack);
-            flashElement(drawerBack);
+                // Sides
+                const sideKey = `Drawer Sides|${drawerSidesDepth}|${boxH}|Slide length × height`;
+                partsMap.set(sideKey, (partsMap.get(sideKey) || 0) + 2);
 
-            const drawerBottom = createDimensionItem(
-                'Drawer Bottom',
-                `${fmt(drawerBottomWidth)} × ${fmt(drawerBottomDepth)} ${unit}`,
-                '1×',
-                `Fits in ${fmt(grooveDepth)}${unit} deep grooves, screws into back from bottom`
-            );
-            components.appendChild(drawerBottom);
-            flashElement(drawerBottom);
+                // Front
+                const frontKey = `Drawer Front|${drawerFrontBackWidth}|${boxH}|Bottom width - clearance`;
+                partsMap.set(frontKey, (partsMap.get(frontKey) || 0) + 1);
 
-            const overlayFront = createDimensionItem(
-                'Overlay Front',
-                `${fmt(overlayWidth)} × ${fmt(overlayHeight)} ${unit}`,
-                '1×',
-                `Extends ${fmt(fo)}${unit} beyond opening on all sides`
-            );
-            components.appendChild(overlayFront);
-            flashElement(overlayFront);
+                // Back
+                const backKey = `Drawer Back|${drawerFrontBackWidth}|${backH}|Reduced height for groove`;
+                partsMap.set(backKey, (partsMap.get(backKey) || 0) + 1);
+
+                // Bottom (same for all usually, unless depth varies, which it doesn't here)
+                const bottomKey = `Drawer Bottom|${drawerBottomWidth}|${drawerBottomDepth}|Fits in grooves`;
+                partsMap.set(bottomKey, (partsMap.get(bottomKey) || 0) + 1);
+
+                // Overlay Front
+                const overlayH = h + (2 * fo);
+                const overlayKey = `Overlay Front|${overlayWidth}|${overlayH}|Extends ${fmt(fo)}${unit} beyond opening`;
+                partsMap.set(overlayKey, (partsMap.get(overlayKey) || 0) + 1);
+            });
+
+            // Render grouped parts
+            partsMap.forEach((count, key) => {
+                const [label, w, h, ctx] = key.split('|');
+                const item = createDimensionItem(
+                    label,
+                    `${fmt(parseFloat(w))} × ${fmt(parseFloat(h))} ${unit}`,
+                    `${count}×`,
+                    ctx
+                );
+                components.appendChild(item);
+                flashElement(item);
+            });
 
             // Drawer Dimensions Summary with Formulas
             const formulas = document.getElementById('drawerFormulas');
@@ -1378,7 +1506,7 @@
 <strong>Drawer Sides Depth</strong> = Slide Length<br>
                     = ${fmt(sl)} ${unit}<br><br>
 <strong>Drawer Front Height</strong> = Opening Height - ${clearanceVal} vertical clearance<br>
-                     = ${fmt(openingHeight)} - ${clearanceVal} = ${fmt(drawerBoxHeight)} ${unit}<br><br>
+                     = ${fmt(maxOpeningHeight)} - ${clearanceVal} = ${fmt(drawerBoxHeight)} ${unit} <em>(shown for largest drawer)</em><br><br>
 <strong>Drawer Back Height</strong> = Front Height - ${fmt(groovePosition)}${unit} groove position - 4${unit} adjustment<br>
                     = ${fmt(drawerBoxHeight)} - ${fmt(groovePosition)} - 4 = ${fmt(drawerBackHeight)} ${unit}<br><br>
 <strong>Bottom Panel Groove</strong>: ${fmt(groovePosition)}${unit} from bottom, ${fmt(grooveDepth)}${unit} deep (half of ${fmt(dt)}${unit} wall thickness)
@@ -1389,7 +1517,11 @@
 
             const openingDim = createDimensionItem(
                 'Opening Size',
-                `${fmt(openingWidth)} × ${fmt(openingHeight)} ${unit}`,
+                'Opening Size',
+                (drawerHeights.every(h => Math.abs(h - drawerHeights[0]) < 0.1)
+                    ? `${fmt(openingWidth)} × ${fmt(drawerHeights[0])} ${unit}`
+                    : `Width: ${fmt(openingWidth)} ${unit}, Height: Varies (see below)`),
+                null,
                 null,
                 'Space available for each drawer'
             );
@@ -1398,7 +1530,11 @@
 
             const boxDim = createDimensionItem(
                 'Drawer Box Size',
-                `${fmt(drawerBoxWidth)} × ${fmt(drawerBoxHeight)} × ${fmt(drawerBoxDepth)} ${unit}`,
+                'Drawer Box Size',
+                (drawerHeights.every(h => Math.abs(h - drawerHeights[0]) < 0.1)
+                    ? `${fmt(drawerBoxWidth)} × ${fmt(drawerBoxHeight)} × ${fmt(drawerBoxDepth)} ${unit}`
+                    : `Width: ${fmt(drawerBoxWidth)} ${unit}, Depth: ${fmt(drawerBoxDepth)} ${unit}, Height: Varies`),
+                null,
                 null,
                 'Actual drawer box dimensions (W × H × D)'
             );
@@ -1440,7 +1576,7 @@
                 'Total Side Clearance',
                 `${fmt(sc)} ${unit} per side`,
                 null,
-                `${fmt(2*sc)} ${unit} total clearance for slide operation`
+                `${fmt(2 * sc)} ${unit} total clearance for slide operation`
             );
             installSpecs.appendChild(sideClearance);
             flashElement(sideClearance);
@@ -1470,17 +1606,20 @@
                 </tbody>
             `;
 
+
+
             const tbody = posTable.querySelector('tbody');
             let currentHeight = bg;
 
-            for (let i = 1; i <= nd; i++) {
+            for (let i = 0; i < nd; i++) {
+                const h = drawerHeights[i];
                 const bottomHeight = currentHeight;
-                const topHeight = currentHeight + openingHeight;
-                const gap = i === 1 ? tg : ds;
+                const topHeight = currentHeight + h;
+                const gap = i === 0 ? tg : ds;
 
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td>Drawer ${i}</td>
+                    <td>Drawer ${i + 1}</td>
                     <td>${fmt(bottomHeight)} ${unit}</td>
                     <td>${fmt(topHeight)} ${unit}</td>
                     <td>${fmt(gap)} ${unit}</td>
@@ -1490,7 +1629,7 @@
                 currentHeight = topHeight + ds;
             }
 
-            // Update assembly notes dynamic values
+
             document.getElementById('totalSideClearance').textContent = `${fmt(sc)}${unit}`;
             document.getElementById('overlapAmount').textContent = `${fmt(fo)}${unit}`;
 
@@ -1510,7 +1649,7 @@
                 warnings.push(`Drawer width is less than ${fmt(minDrawerWidth)}${unit}. This may result in unstable drawer operation.`);
             }
 
-            if (openingHeight < minOpeningHeight) {
+            if (maxOpeningHeight < minOpeningHeight) {
                 warnings.push(`Opening height is less than ${fmt(minOpeningHeight)}${unit}. Drawers may be too shallow for practical use.`);
             }
 
@@ -1522,7 +1661,7 @@
                 warnings.push('Drawer width is critically narrow. Check your slide width and clearance settings.');
             }
 
-            if (openingHeight < criticalOpeningHeight) {
+            if (maxOpeningHeight < criticalOpeningHeight) {
                 warnings.push('Opening height is critically small. Consider reducing number of drawers or increasing cabinet height.');
             }
 
@@ -1547,4 +1686,5 @@
         calculate();
     </script>
 </body>
+
 </html>
