@@ -663,6 +663,9 @@
                     <label for="numDrawers">Number of Drawers</label>
                     <input type="number" id="numDrawers" value="3" step="1" min="1" max="10">
                 </div>
+
+                <!-- Custom per-drawer height inputs — shown only when layout=custom -->
+                <div id="customDrawerHeights" style="display:none;"></div>
             </div>
 
             <!-- Advanced Settings Toggle -->
@@ -696,6 +699,23 @@
                         <label for="bottomGap">Bottom Gap (mm)</label>
                         <input type="number" id="bottomGap" value="2" step="0.1" min="0">
                         <div class="helper-text">Gap from last drawer to cabinet bottom</div>
+                    </div>
+                </div>
+
+                <!-- Groove & Back Clearance Settings -->
+                <div class="card">
+                    <span class="section-header">Groove &amp; Back Clearance</span>
+
+                    <div class="form-group">
+                        <label for="groovePosition">Groove Position (mm)</label>
+                        <input type="number" id="groovePosition" value="18" step="0.5" min="10" max="30">
+                        <div class="helper-text">Distance from drawer bottom to groove centre (standard: 18–19mm)</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="backClearance">Back Clearance (mm)</label>
+                        <input type="number" id="backClearance" value="4" step="0.5" min="0" max="10">
+                        <div class="helper-text">Extra space above groove for bottom panel insertion (standard: 4mm)</div>
                     </div>
                 </div>
 
@@ -864,6 +884,11 @@
                     adjustments.</div>
             </div>
 
+            <!-- Material Sheet Estimate -->
+            <h2 class="result-section-header">Material Sheet Estimate</h2>
+            <p class="result-description">Estimated number of full sheets required. Uses 2440×1220mm (4×8ft) standard sheets. Includes 10% waste allowance.</p>
+            <div class="dimension-list" id="sheetEstimate"></div>
+
             <!-- Warnings -->
             <div id="warningsContainer"></div>
         </main>
@@ -898,7 +923,8 @@
             'boxThickness', 'drawerThickness', 'bottomThickness',
             'drawerSpacing', 'topGap', 'bottomGap',
             'slideWidth', 'frontSetback', 'sideClr',
-            'frontOverlap', 'nailerWidth'
+            'frontOverlap', 'nailerWidth',
+            'groovePosition', 'backClearance'
         ];
 
         // Get all input elements
@@ -921,7 +947,9 @@
             frontOverlap: document.getElementById('frontOverlap'),
             nailerEnabled: document.getElementById('nailerEnabled'),
             nailerWidth: document.getElementById('nailerWidth'),
-            drawerLayout: document.getElementById('drawerLayout')
+            drawerLayout: document.getElementById('drawerLayout'),
+            groovePosition: document.getElementById('groovePosition'),
+            backClearance: document.getElementById('backClearance')
         };
 
         // Advanced Settings Toggle
@@ -964,7 +992,9 @@
                 sideClr: 2,
                 frontOverlap: 19,
                 nailerEnabled: 'yes',
-                nailerWidth: 100
+                nailerWidth: 100,
+                groovePosition: 18,
+                backClearance: 4
             },
             standard600: {
                 cabinetWidth: 600,
@@ -983,7 +1013,9 @@
                 sideClr: 2,
                 frontOverlap: 19,
                 nailerEnabled: 'yes',
-                nailerWidth: 100
+                nailerWidth: 100,
+                groovePosition: 18,
+                backClearance: 4
             }
         };
 
@@ -1005,6 +1037,31 @@
         Object.values(inputs).forEach(input => {
             input.addEventListener('input', calculate);
         });
+
+        // Show/hide and regenerate custom drawer height inputs when layout or count changes
+        function onDrawerLayoutOrCountChange() {
+            const layout = inputs.drawerLayout.value;
+            const container = document.getElementById('customDrawerHeights');
+            if (layout === 'custom') {
+                container.style.display = 'block';
+                const nd = parseInt(inputs.numDrawers.value) || 3;
+                const ch = parseFloat(inputs.cabinetHeight.value) || 900;
+                const bt = parseFloat(inputs.boxThickness.value) || 13;
+                const ds = parseFloat(inputs.drawerSpacing.value) || 2;
+                const tg = parseFloat(inputs.topGap.value) || 2;
+                const bg = parseFloat(inputs.bottomGap.value) || 2;
+                const internalH = ch - (2 * bt);
+                const totalAvail = internalH - tg - bg - ((nd - 1) * ds);
+                const equalH = Math.max(20, totalAvail / nd);
+                renderCustomDrawerInputs(nd, equalH);
+            } else {
+                container.style.display = 'none';
+            }
+            calculate();
+        }
+
+        inputs.drawerLayout.addEventListener('change', onDrawerLayoutOrCountChange);
+        inputs.numDrawers.addEventListener('change', onDrawerLayoutOrCountChange);
 
         // Utility function to format numbers based on current unit
         function fmt(num, decimals = null) {
@@ -1154,6 +1211,15 @@
                 }
             });
 
+            // Convert any custom drawer height inputs
+            document.querySelectorAll('.custom-drawer-height').forEach(inp => {
+                const oldVal = parseFloat(inp.value);
+                if (!isNaN(oldVal)) {
+                    inp.value = newUnit === 'imperial' ? (oldVal * MM_TO_INCH).toFixed(3) : (oldVal * INCH_TO_MM).toFixed(1);
+                    inp.step = newUnit === 'imperial' ? '0.0625' : '0.5';
+                }
+            });
+
             // Convert slide length dropdown
             const slideSelect = inputs.slideLength;
             if (slideSelect) {
@@ -1206,7 +1272,9 @@
                 frontSetback: `Front Setback Distance (${unit})`,
                 sideClr: `Side Clearance Per Slide (${unit})`,
                 frontOverlap: `Front Overlap Amount (${unit})`,
-                nailerWidth: `Nailer Width (${unit})`
+                nailerWidth: `Nailer Width (${unit})`,
+                groovePosition: `Groove Position (${unit})`,
+                backClearance: `Back Clearance (${unit})`
             };
 
             Object.keys(labels).forEach(fieldName => {
@@ -1215,6 +1283,35 @@
                     label.textContent = labels[fieldName];
                 }
             });
+        }
+
+        // Render per-drawer height inputs for custom layout
+        function renderCustomDrawerInputs(nd, equalH) {
+            const container = document.getElementById('customDrawerHeights');
+            container.innerHTML = '<span class="section-header" style="display:block;margin-top:8px;margin-bottom:4px;">Per-Drawer Heights</span>';
+            for (let i = 0; i < nd; i++) {
+                const step = currentUnit === 'metric' ? '0.5' : '0.0625';
+                const val = currentUnit === 'metric' ? equalH.toFixed(1) : equalH.toFixed(3);
+                const unitSuffix = getUnitSuffix();
+                const fg = document.createElement('div');
+                fg.className = 'form-group';
+                fg.innerHTML = `
+                    <label for="customDrawerH${i}">Drawer ${i + 1} Height (${unitSuffix})</label>
+                    <input type="number" id="customDrawerH${i}" class="custom-drawer-height"
+                           value="${val}" step="${step}" min="20">
+                `;
+                container.appendChild(fg);
+                document.getElementById(`customDrawerH${i}`).addEventListener('input', calculate);
+            }
+        }
+
+        // Sheet calculator helper: estimates number of standard sheets needed
+        function calculateSheets(parts, sheetW, sheetH) {
+            const totalArea = parts.reduce((sum, p) => sum + (p.w * p.h * p.qty), 0);
+            const sheetArea = sheetW * sheetH;
+            const sheetsNeeded = Math.ceil((totalArea * 1.10) / sheetArea);
+            const utilization = sheetsNeeded > 0 ? (totalArea / (sheetsNeeded * sheetArea)) * 100 : 0;
+            return { sheets: sheetsNeeded, usedArea: totalArea, totalArea: sheetsNeeded * sheetArea, utilization };
         }
 
         // Add smart input handling to all convertible fields
@@ -1314,6 +1411,44 @@
             const ne = inputs.nailerEnabled.value === 'yes';
             const nw = parseFloat(inputs.nailerWidth.value);
 
+            // Guard: must have at least 1 drawer
+            if (nd < 1 || isNaN(nd)) {
+                document.getElementById('cabinetCutlist').innerHTML =
+                    '<div class="assembly-step">Enter at least 1 drawer to see results.</div>';
+                ['drawerComponents','drawerFormulas','drawerDimensions',
+                 'installationSpecs','drawerPositions','warningsContainer']
+                    .forEach(id => { document.getElementById(id).innerHTML = ''; });
+                return;
+            }
+
+            // Validate all required inputs are finite numbers
+            const requiredInputs = { cw, ch, cd, bt, dt, dbt, nd, ds, tg, bg, sw, fs, sc, fo };
+            const invalidFields = Object.entries(requiredInputs)
+                .filter(([, v]) => !isFinite(v)).map(([k]) => k);
+            if (invalidFields.length > 0) {
+                document.getElementById('warningsContainer').innerHTML = `
+                    <div class="warnings">
+                        <div class="warning-title">Invalid Input</div>
+                        <div class="warning-item">Enter valid numbers for: ${invalidFields.join(', ')}</div>
+                    </div>`;
+                ['cabinetCutlist','drawerComponents','drawerFormulas',
+                 'drawerDimensions','installationSpecs','drawerPositions']
+                    .forEach(id => { document.getElementById(id).innerHTML = ''; });
+                return;
+            }
+            const minMat = currentUnit === 'metric' ? 3 : 0.118;
+            if (bt < minMat || dt < minMat) {
+                document.getElementById('warningsContainer').innerHTML = `
+                    <div class="warnings">
+                        <div class="warning-title">Invalid Input</div>
+                        <div class="warning-item">Material thickness must be at least ${fmt(minMat)} ${getUnitSuffix()}.</div>
+                    </div>`;
+                ['cabinetCutlist','drawerComponents','drawerFormulas',
+                 'drawerDimensions','installationSpecs','drawerPositions']
+                    .forEach(id => { document.getElementById(id).innerHTML = ''; });
+                return;
+            }
+
             // Calculate internal dimensions
             const bottomPanelWidth = cw - (2 * bt); // Bottom panel width (cabinet internal width)
             const internalWidth = bottomPanelWidth;
@@ -1323,6 +1458,21 @@
             // Calculate drawer opening dimensions
             const totalSpacing = (nd - 1) * ds;
             const totalAvailableHeight = internalHeight - tg - bg - totalSpacing;
+
+            // Guard: negative available height
+            if (totalAvailableHeight <= 0) {
+                document.getElementById('warningsContainer').innerHTML = `
+                    <div class="warnings">
+                        <div class="warning-title">Configuration Error</div>
+                        <div class="warning-item">Not enough height for ${nd} drawer(s) with current gaps.
+                        Available: ${fmt(totalAvailableHeight)} ${getUnitSuffix()}.
+                        Reduce drawers, reduce gaps, or increase cabinet height.</div>
+                    </div>`;
+                ['cabinetCutlist','drawerComponents','drawerFormulas',
+                 'drawerDimensions','installationSpecs','drawerPositions']
+                    .forEach(id => { document.getElementById(id).innerHTML = ''; });
+                return;
+            }
 
             // Calculate individual drawer heights based on layout
             let drawerHeights = [];
@@ -1362,8 +1512,16 @@
 
                     drawerHeights = [smallH, smallH, ...Array(restCount).fill(restH)];
                 }
+            } else if (layout === 'custom') {
+                const customInputs = document.querySelectorAll('.custom-drawer-height');
+                drawerHeights = customInputs.length === nd
+                    ? Array.from(customInputs).map(inp => {
+                        const v = parseFloat(inp.value);
+                        return isNaN(v) || v <= 0 ? totalAvailableHeight / nd : v;
+                    })
+                    : Array(nd).fill(totalAvailableHeight / nd);
             } else {
-                // Custom/Fallback: Equal
+                // Fallback: Equal
                 const h = totalAvailableHeight / nd;
                 drawerHeights = Array(nd).fill(h);
             }
@@ -1389,11 +1547,12 @@
             const drawerBoxDepth = drawerSidesDepth;
 
             // Bottom panel groove settings
-            const groovePosition = 18; // mm from bottom (standard 18-19mm)
+            const groovePosition = parseFloat(inputs.groovePosition.value); // from Advanced Settings, default 18mm
+            const backClearance = parseFloat(inputs.backClearance.value);   // from Advanced Settings, default 4mm
             const grooveDepth = dt / 2; // Half of drawer wall thickness
 
             // Drawer back height (reduced to sit above bottom panel groove)
-            const drawerBackHeight = drawerBoxHeight - groovePosition - 4; // 4mm adjustment for groove
+            const drawerBackHeight = drawerBoxHeight - groovePosition - backClearance;
 
             // Bottom panel dimensions (fits in grooves)
             const drawerBottomWidth = drawerFrontBackWidth - (2 * dt);
@@ -1401,7 +1560,7 @@
 
             // Calculate overlay front dimensions
             const overlayWidth = openingWidth + (2 * fo);
-            const overlayHeight = openingHeight + (2 * fo);
+            const overlayHeight = maxOpeningHeight + (2 * fo);
 
             // Effective extension (how far drawer extends from cabinet)
             const effectiveExtension = sl - fs;
@@ -1456,7 +1615,7 @@
 
             drawerHeights.forEach((h, idx) => {
                 const boxH = h - 2;
-                const backH = boxH - groovePosition - 4;
+                const backH = boxH - groovePosition - backClearance;
 
                 // Sides
                 const sideKey = `Drawer Sides|${drawerSidesDepth}|${boxH}|Slide length × height`;
@@ -1496,20 +1655,42 @@
             // Drawer Dimensions Summary with Formulas
             const formulas = document.getElementById('drawerFormulas');
             const clearanceVal = currentUnit === 'metric' ? '2mm' : '0.079in';
+            const allEqualH = drawerHeights.every(h => Math.abs(h - drawerHeights[0]) < 0.1);
+            const heightDisplay = allEqualH
+                ? `${fmt(drawerHeights[0])} ${unit} (all ${nd} drawers equal)`
+                : drawerHeights.map((h, i) => `Drawer ${i+1}: ${fmt(h)} ${unit}`).join(', ');
             formulas.innerHTML = `
-<strong>REAL-WORLD CABINET FORMULAS:</strong><br><br>
-<strong>Bottom Panel Width</strong> = Cabinet Width - (2 × Material Thickness)<br>
-                     = ${fmt(cw)} - (2 × ${fmt(bt)}) = ${fmt(bottomPanelWidth)} ${unit}<br><br>
-<strong>Drawer Front/Back Width</strong> = Bottom Panel Width - Slide Clearance<br>
-                         = ${fmt(bottomPanelWidth)} - ${fmt(drawerWidthReduction)} = ${fmt(drawerFrontBackWidth)} ${unit}<br>
-                         <em>(Slide clearance = ${fmt(sw)} slide width + 2 × ${fmt(sc)} clearance = ${fmt(drawerWidthReduction)}${unit})</em><br><br>
-<strong>Drawer Sides Depth</strong> = Slide Length<br>
-                    = ${fmt(sl)} ${unit}<br><br>
-<strong>Drawer Front Height</strong> = Opening Height - ${clearanceVal} vertical clearance<br>
-                     = ${fmt(maxOpeningHeight)} - ${clearanceVal} = ${fmt(drawerBoxHeight)} ${unit} <em>(shown for largest drawer)</em><br><br>
-<strong>Drawer Back Height</strong> = Front Height - ${fmt(groovePosition)}${unit} groove position - 4${unit} adjustment<br>
-                    = ${fmt(drawerBoxHeight)} - ${fmt(groovePosition)} - 4 = ${fmt(drawerBackHeight)} ${unit}<br><br>
-<strong>Bottom Panel Groove</strong>: ${fmt(groovePosition)}${unit} from bottom, ${fmt(grooveDepth)}${unit} deep (half of ${fmt(dt)}${unit} wall thickness)
+<strong>STEP-BY-STEP CALCULATION:</strong><br><br>
+
+<strong>1. Internal Dimensions</strong><br>
+&nbsp;&nbsp;Internal Width&nbsp;&nbsp;= ${fmt(cw)} − (2 × ${fmt(bt)}) = <b>${fmt(internalWidth)} ${unit}</b><br>
+&nbsp;&nbsp;Internal Height = ${fmt(ch)} − (2 × ${fmt(bt)}) = <b>${fmt(internalHeight)} ${unit}</b><br><br>
+
+<strong>2. Available Drawer Height</strong><br>
+&nbsp;&nbsp;Total Spacing&nbsp;&nbsp;&nbsp;= (${nd} − 1) × ${fmt(ds)} = ${fmt((nd-1)*ds)} ${unit}<br>
+&nbsp;&nbsp;Available&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= ${fmt(internalHeight)} − ${fmt(tg)} (top) − ${fmt(bg)} (bottom) − ${fmt((nd-1)*ds)} (spacing) = <b>${fmt(totalAvailableHeight)} ${unit}</b><br><br>
+
+<strong>3. Opening Heights (${layout} layout)</strong><br>
+&nbsp;&nbsp;${heightDisplay}<br><br>
+
+<strong>4. Drawer Box Width</strong><br>
+&nbsp;&nbsp;Slide Clearance = ${fmt(sw)} (slide) + 2 × ${fmt(sc)} (per side) = ${fmt(drawerWidthReduction)} ${unit}<br>
+&nbsp;&nbsp;Box Width&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= ${fmt(bottomPanelWidth)} − ${fmt(drawerWidthReduction)} = <b>${fmt(drawerFrontBackWidth)} ${unit}</b><br><br>
+
+<strong>5. Drawer Box Height (largest opening)</strong><br>
+&nbsp;&nbsp;Box Height&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= ${fmt(maxOpeningHeight)} − 2 (clearance) = <b>${fmt(drawerBoxHeight)} ${unit}</b><br><br>
+
+<strong>6. Drawer Back Height</strong><br>
+&nbsp;&nbsp;Back Height&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= ${fmt(drawerBoxHeight)} − ${fmt(groovePosition)} (groove) − ${fmt(backClearance)} (clearance) = <b>${fmt(drawerBackHeight)} ${unit}</b><br><br>
+
+<strong>7. Bottom Panel</strong><br>
+&nbsp;&nbsp;Groove depth&nbsp;&nbsp;&nbsp;&nbsp;= ${fmt(dt)} ÷ 2 = ${fmt(grooveDepth)} ${unit} (half wall thickness)<br>
+&nbsp;&nbsp;Bottom Width&nbsp;&nbsp;&nbsp;&nbsp;= ${fmt(drawerFrontBackWidth)} − 2 × ${fmt(dt)} = <b>${fmt(drawerBottomWidth)} ${unit}</b><br>
+&nbsp;&nbsp;Bottom Depth&nbsp;&nbsp;&nbsp;&nbsp;= ${fmt(drawerSidesDepth)} − ${fmt(dt)} = <b>${fmt(drawerBottomDepth)} ${unit}</b><br><br>
+
+<strong>8. Overlay Front (largest drawer)</strong><br>
+&nbsp;&nbsp;Overlay Width&nbsp;&nbsp;&nbsp;= ${fmt(openingWidth)} + 2 × ${fmt(fo)} = <b>${fmt(overlayWidth)} ${unit}</b><br>
+&nbsp;&nbsp;Overlay Height&nbsp;&nbsp;= ${fmt(maxOpeningHeight)} + 2 × ${fmt(fo)} = <b>${fmt(overlayHeight)} ${unit}</b>
             `;
 
             const dimensions = document.getElementById('drawerDimensions');
@@ -1664,6 +1845,71 @@
             if (maxOpeningHeight < criticalOpeningHeight) {
                 warnings.push('Opening height is critically small. Consider reducing number of drawers or increasing cabinet height.');
             }
+
+            // Custom layout: warn if total height exceeds available
+            if (layout === 'custom') {
+                const customSum = drawerHeights.reduce((a, b) => a + b, 0);
+                const totalWithSpacing = customSum + (nd - 1) * ds;
+                if (totalWithSpacing > internalHeight - tg - bg) {
+                    warnings.push(`Custom drawer heights total ${fmt(customSum)} ${unit} but only ${fmt(totalAvailableHeight)} ${unit} is available. Drawers will overlap or not fit.`);
+                }
+            }
+
+            // Per-drawer back height sanity
+            drawerHeights.forEach((h, i) => {
+                const backH = (h - 2) - groovePosition - backClearance;
+                const minBackH = currentUnit === 'metric' ? 30 : 1.18;
+                if (backH < minBackH) {
+                    warnings.push(`Drawer ${i+1} back height (${fmt(backH)} ${unit}) is very short. Consider reducing groove position or back clearance.`);
+                }
+            });
+
+            // Material sheet estimate
+            const sheetEstimateEl = document.getElementById('sheetEstimate');
+            sheetEstimateEl.innerHTML = '';
+            const sheetW = currentUnit === 'metric' ? 2440 : 96.063;
+            const sheetH = currentUnit === 'metric' ? 1220 : 48.031;
+            const sheetLabel = currentUnit === 'metric' ? '2440×1220mm' : '96×48in';
+            const areaDivisor = currentUnit === 'metric' ? 1e6 : 144;
+            const areaUnit = currentUnit === 'metric' ? 'm²' : 'ft²';
+
+            const cabinetParts = [
+                { label: 'Side Panels', w: ch, h: cd, qty: 2 },
+                { label: 'Top/Bottom Panels', w: bottomPanelWidth, h: cd, qty: 2 },
+                { label: 'Back Panel', w: cw - 2*bt, h: ch - 2*bt, qty: 1 }
+            ];
+            if (ne) cabinetParts.push({ label: 'Nailer Strips', w: bottomPanelWidth, h: nw, qty: 4 });
+
+            const drawerBoxParts = [];
+            drawerHeights.forEach((h, i) => {
+                const boxH = h - 2;
+                const bH = boxH - groovePosition - backClearance;
+                drawerBoxParts.push(
+                    { w: drawerSidesDepth, h: boxH, qty: 2 },
+                    { w: drawerFrontBackWidth, h: boxH, qty: 1 },
+                    { w: drawerFrontBackWidth, h: bH, qty: 1 }
+                );
+            });
+
+            const drawerBottomParts = drawerHeights.map(() => ({
+                w: drawerBottomWidth, h: drawerBottomDepth, qty: 1
+            }));
+
+            [
+                { label: `Cabinet Box Material (${fmt(bt)}${unit} thick)`, parts: cabinetParts },
+                { label: `Drawer Box Material (${fmt(dt)}${unit} thick)`, parts: drawerBoxParts },
+                { label: `Drawer Bottom Material (${fmt(dbt)}${unit} thick)`, parts: drawerBottomParts }
+            ].forEach(({ label, parts }) => {
+                const result = calculateSheets(parts, sheetW, sheetH);
+                const item = createDimensionItem(
+                    label,
+                    `${result.sheets} sheet${result.sheets !== 1 ? 's' : ''} (${result.utilization.toFixed(0)}% used)`,
+                    null,
+                    `${sheetLabel} sheets • Used: ${(result.usedArea / areaDivisor).toFixed(2)} ${areaUnit} of ${(result.totalArea / areaDivisor).toFixed(2)} ${areaUnit}`
+                );
+                sheetEstimateEl.appendChild(item);
+                flashElement(item);
+            });
 
             // Display warnings
             const warningsContainer = document.getElementById('warningsContainer');
