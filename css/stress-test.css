@@ -1,0 +1,307 @@
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg: #0f0f0f;
+            --bg-card: #1a1a1a;
+            --bg-card2: #242424;
+            --border: #2e2e2e;
+            --text: #e8e8e8;
+            --text-dim: #8a8a8a;
+            --green: #22c55e;
+            --green-bg: #052e16;
+            --red: #ef4444;
+            --red-bg: #2d0b0b;
+            --yellow: #f59e0b;
+            --yellow-bg: #2d1f02;
+            --blue: #3b82f6;
+            --blue-bg: #0c1a3b;
+            --mono: 'SFMono-Regular', 'Menlo', 'Consolas', monospace;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            line-height: 1.5;
+            padding: 32px 24px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 22px;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            margin-bottom: 4px;
+        }
+
+        .subtitle {
+            color: var(--text-dim);
+            font-size: 13px;
+            margin-bottom: 28px;
+        }
+
+        /* Summary bar */
+        .summary-bar {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 12px;
+            margin-bottom: 32px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px 20px;
+        }
+
+        .stat-card .label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-dim);
+            margin-bottom: 6px;
+        }
+
+        .stat-card .value {
+            font-size: 28px;
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .stat-card.pass .value { color: var(--green); }
+        .stat-card.fail .value { color: var(--red); }
+        .stat-card.warn .value { color: var(--yellow); }
+        .stat-card.info .value { color: var(--blue); }
+
+        .progress-bar {
+            background: var(--border);
+            border-radius: 4px;
+            height: 6px;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 4px;
+            background: var(--green);
+            transition: width 0.6s ease;
+        }
+
+        /* Precision legend */
+        .precision-legend {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 28px;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: var(--text-dim);
+        }
+
+        .legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        /* Section header */
+        .section {
+            margin-bottom: 32px;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .section-title {
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+        }
+
+        .section-badge {
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-weight: 500;
+        }
+
+        .badge-pass { background: var(--green-bg); color: var(--green); }
+        .badge-fail { background: var(--red-bg); color: var(--red); }
+        .badge-mixed { background: var(--yellow-bg); color: var(--yellow); }
+
+        /* Test table */
+        .test-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .test-table th {
+            text-align: left;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--text-dim);
+            font-weight: 500;
+            padding: 8px 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .test-table td {
+            padding: 9px 12px;
+            border-bottom: 1px solid #1e1e1e;
+            vertical-align: middle;
+        }
+
+        .test-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .test-table tr:hover td {
+            background: var(--bg-card2);
+        }
+
+        .test-table .mono {
+            font-family: var(--mono);
+            font-size: 12px;
+        }
+
+        /* Status pill */
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+        }
+
+        .pill-pass { background: var(--green-bg); color: var(--green); }
+        .pill-fail { background: var(--red-bg); color: var(--red); }
+        .pill-warn { background: var(--yellow-bg); color: var(--yellow); }
+
+        /* Delta cell */
+        .delta-good { color: var(--green); font-family: var(--mono); font-size: 12px; }
+        .delta-warn { color: var(--yellow); font-family: var(--mono); font-size: 12px; }
+        .delta-bad  { color: var(--red); font-family: var(--mono); font-size: 12px; }
+
+        /* Precision indicator */
+        .prec {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 4px;
+        }
+
+        .prec-1mm   { background: var(--green); }
+        .prec-05mm  { background: #84cc16; }
+        .prec-01mm  { background: #06b6d4; }
+        .prec-exact { background: #a855f7; }
+        .prec-fail  { background: var(--red); }
+
+        /* Formula chip */
+        .formula-chip {
+            font-family: var(--mono);
+            font-size: 11px;
+            color: var(--text-dim);
+            background: #1e1e1e;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        /* Input params */
+        .inputs-cell {
+            font-family: var(--mono);
+            font-size: 11px;
+            color: var(--text-dim);
+            max-width: 280px;
+        }
+
+        /* Category row */
+        .cat-row td {
+            background: var(--bg-card);
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-dim);
+            padding: 6px 12px;
+        }
+
+        /* Run button */
+        .run-btn {
+            background: #fff;
+            color: #000;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 28px;
+        }
+
+        .run-btn:hover { background: #e5e5e5; }
+
+        /* Precision matrix */
+        .prec-matrix {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .prec-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .prec-card h3 {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 14px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        .prec-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 0;
+            border-bottom: 1px solid #1e1e1e;
+            font-size: 13px;
+        }
+
+        .prec-row:last-child { border-bottom: none; }
+
+        .prec-row .name { color: var(--text-dim); font-size: 12px; }
+        .prec-row .val  { font-family: var(--mono); font-size: 12px; }
+
+        footer {
+            margin-top: 48px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+            font-size: 12px;
+            color: var(--text-dim);
+        }
